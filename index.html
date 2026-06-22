@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NH Creative | Crafting Experiences. Building Impressions.</title>
+    
+    <!-- Fonts: Elegant Serif & Modern Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0a0a0a',
+                        darkCharcoal: '#141414',
+                        vintageBrown: '#8B5A2B',
+                        vintageBrownDark: '#5C3A18',
+                        softGold: '#D4AF37',
+                        softGoldLight: '#F3E5AB',
+                        warmBeige: '#F5F5DC',
+                        cream: '#FDFBF7'
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        'marquee': 'marquee 25s linear infinite',
+                        'marquee2': 'marquee2 25s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                        marquee2: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(0%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- ES Modules Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.3.1",
+            "react-dom": "https://esm.sh/react-dom@18.3.1",
+            "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+            "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+            "framer-motion": "https://esm.sh/framer-motion@11.2.10?external=react,react-dom"
+        }
+    }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #FDFBF7;
+            overflow-x: hidden;
+            cursor: none;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.8s ease, color 0.8s ease;
+        }
+        
+        html.light body {
+            background-color: #F5F5DC;
+            color: #141414;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 90, 43, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+        .glass-dark {
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .glass-light {
+            background: rgba(253, 251, 247, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(139, 90, 43, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .noise-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        html.light .noise-bg {
+            opacity: 0.03;
+            mix-blend-mode: multiply;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #dev-warning {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #0a0a0a;
+            z-index: 99999;
+            color: #D4AF37;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="selection:bg-softGold selection:text-dark">
+
+    <div id="dev-warning">
+        <h1 class="text-5xl mb-4">Access Restricted</h1>
+        <p class="font-sans text-cream text-lg">Developer tools inspection is locked on this premium experience.</p>
+        <div class="mt-8 w-16 h-px bg-softGold"></div>
+    </div>
+
+    <div class="noise-bg"></div>
+    <div id="canvas-container"></div>
+    <div id="root"></div>
+
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('dragstart', event => event.preventDefault());
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || 
+               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+               (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+                showDevWarning();
+            }
+        });
+
+        function showDevWarning() {
+            const warning = document.getElementById('dev-warning');
+            warning.style.display = 'flex';
+            setTimeout(() => { warning.style.display = 'none'; }, 4000);
+        }
+    </script>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, createContext, useContext } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { createPortal } from 'react-dom';
+        import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
+
+        const ThemeContext = createContext();
+
+        class AudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.oscillator = null;
+                this.gainNode = null;
+                this.filter = null;
+                this.isPlaying = false;
+                this.lfo = null;
+            }
+
+            init() {
+                if(this.ctx) return;
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                this.oscillator = this.ctx.createOscillator();
+                this.oscillator.type = 'triangle';
+                this.oscillator.frequency.value = 60;
+
+                this.filter = this.ctx.createBiquadFilter();
+                this.filter.type = 'lowpass';
+                this.filter.frequency.value = 300;
+
+                this.lfo = this.ctx.createOscillator();
+                this.lfo.type = 'sine';
+                this.lfo.frequency.value = 0.1; 
+                const lfoGain = this.ctx.createGain();
+                lfoGain.gain.value = 100;
+                
+                this.lfo.connect(lfoGain);
+                lfoGain.connect(this.filter.frequency);
+
+                this.gainNode = this.ctx.createGain();
+                this.gainNode.gain.value = 0;
+
+                this.oscillator.connect(this.filter);
+                this.filter.connect(this.gainNode);
+                this.gainNode.connect(this.ctx.destination);
+
+                this.oscillator.start();
+                this.lfo.start();
+            }
+
+            toggle() {
+                if(!this.ctx) this.init();
+                
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+
+                if(this.isPlaying) {
+                    this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 1);
+                } else {
+                    this.gainNode.gain.setTargetAtTime(0.2, this.ctx.currentTime, 2);
+                }
+                this.isPlaying = !this.isPlaying;
+                return this.isPlaying;
+            }
+        }
+
+        const audioEngine = new AudioEngine();
+
+        let threeScene, threeRenderer, threeParticlesMat, threeAmbientLight, threePointLight;
+
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            threeScene = new THREE.Scene();
+            threeScene.fog = new THREE.FogExp2(0x0a0a0a, 0.001);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            threeRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+            
+            threeRenderer.setSize(window.innerWidth, window.innerHeight);
+            threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(threeRenderer.domElement);
+
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 35; 
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            threeParticlesMat = new THREE.PointsMaterial({
+                size: 0.015,
+                color: 0xD4AF37,
+                transparent: true,
+                opacity: 0.5,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, threeParticlesMat);
+            threeScene.add(particlesMesh);
+
+            const objects = [];
+            const geoTypes = [
+                new THREE.IcosahedronGeometry(1.5, 0),
+                new THREE.OctahedronGeometry(1.2, 0),
+                new THREE.TorusGeometry(1, 0.02, 16, 100)
+            ];
+            
+            const objMat = new THREE.MeshStandardMaterial({
+                color: 0x8B5A2B,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.15
+            });
+
+            for(let i=0; i<6; i++) {
+                const geo = geoTypes[Math.floor(Math.random() * geoTypes.length)];
+                const mesh = new THREE.Mesh(geo, objMat);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 25,
+                    (Math.random() - 0.5) * 25,
+                    (Math.random() - 0.5) * 15 - 5
+                );
+                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+                threeScene.add(mesh);
+                objects.push({
+                    mesh,
+                    rotSpeed: { x: (Math.random() - 0.5) * 0.002, y: (Math.random() - 0.5) * 0.002 },
+                    initialY: mesh.position.y,
+                    floatSpeed: Math.random() * 2 + 1.5
+                });
+            }
+
+            threeAmbientLight = new THREE.AmbientLight(0xffffff, 0.3);
+            threeScene.add(threeAmbientLight);
+            
+            threePointLight = new THREE.PointLight(0xD4AF37, 2, 50);
+            threePointLight.position.set(5, 5, 5);
+            threeScene.add(threePointLight);
+
+            camera.position.z = 7;
+
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            let scrollY = window.scrollY;
+            window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+            const clock = new THREE.Clock();
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const elapsedTime = clock.getElapsedTime();
+
+                targetX = mouseX * 0.0005;
+                targetY = mouseY * 0.0005;
+
+                particlesMesh.rotation.y += 0.0002;
+                particlesMesh.rotation.x += 0.0001;
+                
+                camera.position.x += (targetX - camera.position.x) * 0.05;
+                camera.position.y += (-targetY - (scrollY * 0.001) - camera.position.y) * 0.05;
+                camera.lookAt(threeScene.position);
+
+                objects.forEach((obj, i) => {
+                    obj.mesh.rotation.x += obj.rotSpeed.x;
+                    obj.mesh.rotation.y += obj.rotSpeed.y;
+                    obj.mesh.position.y = obj.initialY + Math.sin(elapsedTime / obj.floatSpeed + i) * 0.6;
+                });
+
+                threeRenderer.render(threeScene, camera);
+            };
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                threeRenderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        const updateThreeTheme = (isDark) => {
+            if(!threeScene || !threeParticlesMat) return;
+            if(isDark) {
+                threeScene.fog.color.setHex(0x0a0a0a);
+                threeParticlesMat.color.setHex(0xD4AF37);
+                threeParticlesMat.opacity = 0.5;
+                threePointLight.color.setHex(0xD4AF37);
+            } else {
+                threeScene.fog.color.setHex(0xF5F5DC);
+                threeParticlesMat.color.setHex(0x8B5A2B);
+                threeParticlesMat.opacity = 0.3;
+                threePointLight.color.setHex(0x8B5A2B);
+            }
+        };
+
+        const CustomCursor = () => {
+            const cursorRef = useRef(null);
+            const dotRef = useRef(null);
+            const [isHovering, setIsHovering] = useState(false);
+            const { theme } = useContext(ThemeContext);
+
+            useEffect(() => {
+                const moveCursor = (e) => {
+                    if(cursorRef.current && dotRef.current) {
+                        cursorRef.current.style.transform = `translate3d(${e.clientX - 16}px, ${e.clientY - 16}px, 0)`;
+                        dotRef.current.style.transform = `translate3d(${e.clientX - 4}px, ${e.clientY - 4}px, 0)`;
+                    }
+                };
+
+                const handleMouseOver = (e) => {
+                    const target = e.target;
+                    const isClickable = target.closest('a, button, [role="button"], input, textarea, .interactive');
+                    setIsHovering(!!isClickable);
+                };
+
+                window.addEventListener('mousemove', moveCursor);
+                window.addEventListener('mouseover', handleMouseOver);
+
+                return () => {
+                    window.removeEventListener('mousemove', moveCursor);
+                    window.removeEventListener('mouseover', handleMouseOver);
+                };
+            }, []);
+
+            const cursorColor = theme === 'dark' ? 'border-softGold' : 'border-vintageBrown';
+            const dotColor = theme === 'dark' ? 'bg-softGold' : 'bg-vintageBrown';
+            const hoverBg = theme === 'dark' ? 'bg-softGold/10' : 'bg-vintageBrown/10';
+
+            return (
+                <div className="hidden md:block">
+                    <div ref={cursorRef} className={`fixed top-0 left-0 w-8 h-8 rounded-full border pointer-events-none z-[9999] transition-all duration-300 ease-out ${cursorColor} ${isHovering ? `scale-[2.5] ${hoverBg} border-transparent backdrop-blur-[1px]` : 'scale-100'}`} style={{ mixBlendMode: theme==='dark' ? 'difference' : 'normal' }} />
+                    <div ref={dotRef} className={`fixed top-0 left-0 w-2 h-2 rounded-full pointer-events-none z-[9999] transition-all duration-150 ${dotColor} ${isHovering ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`} />
+                </div>
+            );
+        };
+
+        const FloatingControls = () => {
+            const [isPlaying, setIsPlaying] = useState(false);
+            const { theme, toggleTheme } = useContext(ThemeContext);
+
+            const handleToggleAudio = () => {
+                const state = audioEngine.toggle();
+                setIsPlaying(state);
+            };
+
+            return (
+                <div className="fixed bottom-8 left-8 z-50 flex flex-col gap-4">
+                    <button onClick={handleToggleAudio} className="flex items-center gap-3 group" title="Toggle Ambient Audio">
+                        <div className={`relative w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${theme === 'dark' ? 'border-gray-700 group-hover:border-softGold text-gray-400 group-hover:text-softGold' : 'border-gray-300 group-hover:border-vintageBrown text-gray-500 group-hover:text-vintageBrown'}`}>
+                            {isPlaying ? (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                            ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+                            )}
+                            {isPlaying && <div className={`absolute inset-0 rounded-full animate-ping border opacity-40 ${theme === 'dark' ? 'border-softGold' : 'border-vintageBrown'}`}></div>}
+                        </div>
+                    </button>
+
+                    <button onClick={toggleTheme} className="flex items-center gap-3 group" title="Toggle Theme">
+                        <div className={`relative w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${theme === 'dark' ? 'border-gray-700 group-hover:border-softGold text-gray-400 group-hover:text-softGold' : 'border-gray-300 group-hover:border-vintageBrown text-gray-500 group-hover:text-vintageBrown'}`}>
+                            {theme === 'dark' ? (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                            )}
+                        </div>
+                    </button>
+                </div>
+            );
+        };
+
+        const SectionHeading = ({ title, subtitle, center = true }) => {
+            const { theme } = useContext(ThemeContext);
+            const subtitleColor = theme === 'dark' ? 'text-softGold drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]' : 'text-vintageBrown';
+            const titleColor = theme === 'dark' ? 'text-cream' : 'text-darkCharcoal';
+            const lineColor = theme === 'dark' ? 'via-softGold' : 'via-vintageBrown';
+
+            return (
+                <div className={`mb-20 flex flex-col ${center ? 'items-center text-center' : 'items-start text-left'}`}>
+                    <motion.span 
+                        initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }}
+                        className={`uppercase tracking-[0.3em] text-[10px] sm:text-xs font-semibold mb-4 ${subtitleColor}`}
+                    >
+                        {subtitle}
+                    </motion.span>
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ delay: 0.1 }}
+                        className={`font-serif text-4xl md:text-5xl lg:text-6xl ${titleColor} leading-tight`}
+                    >
+                        {title}
+                    </motion.h2>
+                    <motion.div 
+                        initial={{ width: 0, opacity: 0 }} whileInView={{ width: '80px', opacity: 1 }} viewport={{ once: true }} transition={{ duration: 1, delay: 0.3 }}
+                        className={`h-px bg-gradient-to-r from-transparent ${lineColor} to-transparent mt-8 ${center ? '' : 'ml-0'}`}
+                        style={{ background: center ? undefined : `linear-gradient(to right, ${theme === 'dark' ? '#D4AF37' : '#8B5A2B'}, transparent)` }}
+                    />
+                </div>
+            );
+        };
+
+        const LoadingScreen = ({ onComplete }) => {
+            const [progress, setProgress] = useState(0);
+
+            useEffect(() => {
+                const duration = 2000;
+                const interval = 20;
+                const steps = duration / interval;
+                let currentStep = 0;
+
+                const timer = setInterval(() => {
+                    currentStep++;
+                    setProgress(Math.min((currentStep / steps) * 100, 100));
+                    if(currentStep >= steps) {
+                        clearInterval(timer);
+                        setTimeout(onComplete, 400); 
+                    }
+                }, interval);
+
+                return () => clearInterval(timer);
+            }, [onComplete]);
+
+            return (
+                <motion.div 
+                    className="fixed inset-0 z-[1000] bg-dark flex flex-col items-center justify-center"
+                    exit={{ opacity: 0, y: '-5%', filter: 'blur(10px)' }}
+                    transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+                >
+                    <div className="font-serif text-4xl font-bold tracking-widest text-gray-800 flex items-center gap-2 mb-8 relative">
+                        <span className="text-gray-700">NH</span><span className="text-sm font-sans tracking-widest font-light ml-3 text-gray-800">CREATIVE</span>
+                        <div 
+                            className="absolute inset-0 overflow-hidden text-softGold whitespace-nowrap transition-all duration-75"
+                            style={{ width: `${progress}%`, clipPath: `inset(0 ${100 - progress}% 0 0)` }}
+                        >
+                            <span className="text-softGold">NH</span><span className="text-sm font-sans tracking-widest font-light ml-3 text-softGold">CREATIVE</span>
+                        </div>
+                    </div>
+                    
+                    <div className="w-64 h-[1px] bg-gray-900 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 h-full bg-softGold shadow-[0_0_15px_rgba(212,175,55,1)]" style={{ width: `${progress}%`, transition: 'width 0.1s linear' }} />
+                    </div>
+                    <div className="mt-6 text-[9px] tracking-[0.4em] text-gray-600 uppercase font-sans font-light">
+                        {Math.floor(progress)}% — Initializing Experience
+                    </div>
+                </motion.div>
+            );
+        };
+
+        const Navbar = () => {
+            const [scrolled, setScrolled] = useState(false);
+            const { theme } = useContext(ThemeContext);
+
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const navClass = scrolled ? (theme === 'dark' ? 'glass-dark py-4' : 'glass-light py-4') : 'bg-transparent py-6 md:py-8';
+            const textColor = theme === 'dark' ? 'text-cream' : 'text-darkCharcoal';
+            const accentColor = theme === 'dark' ? 'text-softGold' : 'text-vintageBrown';
+            const linkColor = theme === 'dark' ? 'text-gray-400 hover:text-softGold' : 'text-gray-600 hover:text-vintageBrown';
+
+            return (
+                <motion.nav 
+                    initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
+                    className={`fixed top-0 w-full z-40 transition-all duration-500 ${navClass}`}
+                >
+                    <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
+                        // GANTI MENJADI INI (Gambar Logo)
+<a href="#" className="flex items-center group">
+    <img 
+        src="https://res.cloudinary.com/dsqqutdgv/image/upload/v1776667950/LOGO_NH_mtsgjt.png" 
+        alt="NH Creative Logo" 
+        className="h-8 md:h-10 w-auto object-contain transition-transform duration-500 group-hover:scale-105" 
+    />
+</a>
+                        <div className={`hidden md:flex gap-8 text-[11px] uppercase tracking-[0.2em] font-medium`}>
+                            <a href="#about" className={`${linkColor} transition-colors duration-300`}>Story</a>
+                            <a href="#portfolio" className={`${linkColor} transition-colors duration-300`}>Work</a>
+                            <a href="#services" className={`${linkColor} transition-colors duration-300`}>Expertise</a>
+                            <a href="#journal" className={`${linkColor} transition-colors duration-300`}>Journal</a>
+                        </div>
+                        <div className="flex gap-4">
+                            <a href="#contact" className={`px-5 py-2.5 border text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 interactive ${theme === 'dark' ? 'border-softGold/50 text-softGold hover:bg-softGold hover:text-dark' : 'border-vintageBrown/50 text-vintageBrown hover:bg-vintageBrown hover:text-warmBeige'}`}>
+                                Collaborate
+                            </a>
+                        </div>
+                    </div>
+                </motion.nav>
+            );
+        };
+
+        const Hero = () => {
+            const { theme } = useContext(ThemeContext);
+            return (
+                <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                    <div className={`absolute inset-0 bg-gradient-to-b ${theme==='dark' ? 'from-dark/10 via-dark/40 to-dark' : 'from-warmBeige/10 via-warmBeige/40 to-warmBeige'} z-0 transition-colors duration-800`}></div>
+                    
+                    <div className="container mx-auto px-6 relative z-10 text-center flex flex-col items-center mt-12">
+                        <motion.div initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }} animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }} transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}>
+                            <h1 className={`font-serif text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-bold leading-[1] mb-6 tracking-tight ${theme==='dark' ? 'text-cream drop-shadow-2xl' : 'text-darkCharcoal'}`}>
+                                NH CREATIVE
+                            </h1>
+                        </motion.div>
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.8 }} className="overflow-hidden">
+                            <p className={`text-sm md:text-xl font-light tracking-[0.2em] uppercase max-w-2xl mx-auto mb-12 ${theme==='dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                Crafting Experiences. <br className="md:hidden" /><span className={`italic font-serif normal-case ${theme==='dark' ? 'text-softGold' : 'text-vintageBrown'}`}>Building Impressions.</span>
+                            </p>
+                        </motion.div>
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 1.2 }} className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto">
+                            <a href="#portfolio" className={`px-8 py-4 font-bold tracking-[0.2em] uppercase text-xs transition-all duration-500 text-center interactive ${theme==='dark' ? 'bg-softGold text-dark hover:bg-cream hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]' : 'bg-vintageBrown text-warmBeige hover:bg-darkCharcoal hover:shadow-[0_0_20px_rgba(139,90,43,0.3)]'}`}>
+                                View Portfolio
+                            </a>
+                            <a href="#contact" className={`px-8 py-4 border font-medium tracking-[0.2em] uppercase text-xs transition-all duration-500 flex items-center justify-center gap-3 interactive ${theme==='dark' ? 'border-gray-600 glass-dark text-cream hover:border-softGold hover:text-softGold' : 'border-gray-400 glass-light text-darkCharcoal hover:border-vintageBrown hover:text-vintageBrown'}`}>
+                                Start Project
+                            </a>
+                        </motion.div>
+                    </div>
+
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 2 }} className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
+                        <span className={`text-[9px] uppercase tracking-[0.3em] font-medium ${theme==='dark'?'text-gray-500':'text-gray-400'}`}>Scroll to Explore</span>
+                        <div className={`w-[1px] h-16 relative overflow-hidden ${theme==='dark'?'bg-gray-800':'bg-gray-300'}`}>
+                            <motion.div animate={{ y: ['-100%', '100%'] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} className={`absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-transparent ${theme==='dark'?'via-softGold':'via-vintageBrown'} to-transparent`} />
+                        </div>
+                    </motion.div>
+                </section>
+            );
+        };
+
+        const About = () => {
+            const { theme } = useContext(ThemeContext);
+            return (
+                <section id="about" className="py-32 relative z-10">
+                    <div className="container mx-auto px-6 md:px-12">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                            <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1 }}>
+                                <SectionHeading title="The Genesis" subtitle="Our Story" center={false} />
+                                <div className={`space-y-6 text-sm leading-relaxed font-light ${theme==='dark'?'text-gray-400':'text-gray-600'}`}>
+                                    <p>
+                                        Born from a passion for impeccable aesthetics and seamless functionality, <strong className={theme==='dark'?'text-cream':'text-darkCharcoal'}>NH Creative</strong> operates at the intersection of art and digital engineering. We believe that a brand is more than a logo; it's a living ecosystem.
+                                    </p>
+                                    <p>
+                                        From crafting bespoke digital identities to engineering immersive web experiences, our philosophy remains simple: <em className={theme==='dark'?'text-softGold':'text-vintageBrown'}>Design with purpose, build with precision.</em>
+                                    </p>
+                                </div>
+                                <div className="mt-12 flex items-center gap-6">
+                                    <div className="flex -space-x-4">
+                                        {[1,2,3].map(i => (
+                                            <div key={i} className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-serif text-xs ${theme==='dark'?'border-dark bg-gray-800 text-gray-400':'border-warmBeige bg-gray-300 text-gray-600'}`}>0{i}</div>
+                                        ))}
+                                    </div>
+                                    <div className={`text-xs uppercase tracking-widest ${theme==='dark'?'text-gray-500':'text-gray-500'}`}>
+                                        A multi-disciplinary<br/><span className={theme==='dark'?'text-cream':'text-darkCharcoal'}>Creative Team</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                            
+                            <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1 }} className="relative h-[600px] rounded-2xl overflow-hidden">
+                                <div className={`absolute inset-0 ${theme==='dark'?'bg-darkCharcoal':'bg-[#E8E0D5]'} flex items-center justify-center`}>
+                                    <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwYXRoIGQ9Ik0wIDBMMCA4TDggOEw4IDBaIiBmaWxsPSJub25lIiBzdHJva2U9IiM1NTViIiBzdHJva2Utd2lkdGg9IjAuNSIvPjwvc3ZnPg==')]"></div>
+                                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} className={`w-64 h-64 border border-dashed rounded-full flex items-center justify-center ${theme==='dark'?'border-softGold/30':'border-vintageBrown/30'}`}>
+                                        <div className={`w-48 h-48 border rounded-full ${theme==='dark'?'border-softGold/20':'border-vintageBrown/20'}`}></div>
+                                    </motion.div>
+                                    // GANTI DENGAN GAMBAR LOGO SAMAR
+<img 
+    src="https://res.cloudinary.com/dsqqutdgv/image/upload/v1776668010/LOGO_NH_Creative_CDR_FIX_byrppq.png" 
+    alt="Logo Watermark" 
+    className="absolute w-40 h-40 object-contain opacity-20" 
+/>
+                                <div className={`absolute bottom-8 left-8 right-8 p-6 rounded-xl backdrop-blur-md border ${theme==='dark'?'bg-black/40 border-white/10':'bg-white/40 border-black/10'}`}>
+                                    <p className={`text-sm italic ${theme==='dark'?'text-gray-300':'text-gray-700'}`}>"We turn abstract visions into digital realities that command attention."</p>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Process = () => {
+            const { theme } = useContext(ThemeContext);
+            const steps = ["Discovery", "Concept", "Design", "Development", "Delivery"];
+            return (
+                <section className={`py-32 border-y relative z-10 ${theme==='dark' ? 'border-gray-900 bg-black/40' : 'border-gray-300 bg-white/40'} backdrop-blur-sm`}>
+                    <div className="container mx-auto px-6 md:px-12">
+                        <SectionHeading title="Creative Process" subtitle="How We Work" />
+                        <div className="flex flex-col md:flex-row justify-between relative mt-20">
+                            <div className={`absolute top-1/2 left-0 w-full h-px -translate-y-1/2 hidden md:block ${theme==='dark'?'bg-gray-800':'bg-gray-300'}`}></div>
+                            {steps.map((step, idx) => (
+                                <motion.div key={idx} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: idx * 0.15 }} className="relative z-10 flex flex-col items-center mb-12 md:mb-0 group">
+                                    <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center font-serif text-xl mb-6 transition-all duration-500 ${theme==='dark' ? 'bg-dark border-gray-700 text-gray-500 group-hover:border-softGold group-hover:text-softGold' : 'bg-warmBeige border-gray-300 text-gray-400 group-hover:border-vintageBrown group-hover:text-vintageBrown'}`}>0{idx + 1}</div>
+                                    <h4 className={`text-sm uppercase tracking-widest font-medium ${theme==='dark' ? 'text-cream' : 'text-darkCharcoal'}`}>{step}</h4>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const AIAssistant = () => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [messages, setMessages] = useState([{ text: "Hello! I am NH AI Assistant. How can I help you build your digital experience today?", sender: "ai" }]);
+            const [input, setInput] = useState("");
+            const messagesEndRef = useRef(null);
+            const { theme } = useContext(ThemeContext);
+
+            const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            useEffect(() => { scrollToBottom(); }, [messages, isOpen]);
+
+            const handleSend = (e) => {
+                e.preventDefault();
+                if (!input.trim()) return;
+                const userMsg = input.trim();
+                setMessages(prev => [...prev, { text: userMsg, sender: "user" }]);
+                setInput("");
+
+                setTimeout(() => {
+                    let aiResponse = "Thank you for reaching out! Our team will get back to you soon. Would you like to schedule a consultation?";
+                    const lowerInput = userMsg.toLowerCase();
+                    if (lowerInput.includes("budget") || lowerInput.includes("price") || lowerInput.includes("cost")) {
+                        aiResponse = "Our project investments vary based on complexity. Landing pages start from standard tiers, while full bespoke platforms and branding are custom-quoted. I recommend booking a free consultation call!";
+                    } else if (lowerInput.includes("service") || lowerInput.includes("package")) {
+                        aiResponse = "We offer Web Development, Landing Pages, Brand Identity, and Digital Invitations (NHVitation). Which specific area are you looking to enhance?";
+                    } else if (lowerInput.includes("recommend")) {
+                        aiResponse = "For a complete digital transformation, I highly recommend our 'Ecosystem Package' which includes Branding, a Custom Website, and UI/UX Strategy.";
+                    }
+                    setMessages(prev => [...prev, { text: aiResponse, sender: "ai" }]);
+                }, 1000);
+            };
+
+            return (
+                <>
+                    <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 2, type: "spring" }} onClick={() => setIsOpen(true)} className={`fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl interactive transition-all duration-300 ${theme === 'dark' ? 'bg-softGold text-dark hover:bg-cream' : 'bg-vintageBrown text-warmBeige hover:bg-darkCharcoal'}`}>
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    </motion.button>
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className={`fixed bottom-24 right-8 z-50 w-80 sm:w-96 h-[500px] rounded-2xl flex flex-col overflow-hidden shadow-2xl border ${theme === 'dark' ? 'glass-dark border-softGold/20' : 'glass-light border-vintageBrown/20'}`}>
+                                <div className={`p-4 border-b flex justify-between items-center ${theme === 'dark' ? 'bg-dark/80 border-gray-800' : 'bg-white/80 border-gray-300'}`}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-softGold to-vintageBrown flex items-center justify-center text-dark font-serif text-xs font-bold">AI</div>
+                                        <div>
+                                            <h4 className={`text-sm font-bold ${theme === 'dark' ? 'text-cream' : 'text-darkCharcoal'}`}>NH AI Assistant</h4>
+                                            <p className="text-[10px] text-green-500 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Online</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setIsOpen(false)} className={`p-1 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-200 text-gray-600'}`}>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                                <div className={`flex-1 p-4 overflow-y-auto flex flex-col gap-4 ${theme === 'dark' ? 'bg-black/40' : 'bg-[#E8E0D5]/40'}`}>
+                                    {messages.map((msg, idx) => (
+                                        <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                            <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.sender === 'user' ? (theme === 'dark' ? 'bg-softGold text-dark rounded-br-sm' : 'bg-vintageBrown text-warmBeige rounded-br-sm') : (theme === 'dark' ? 'bg-gray-800 text-cream rounded-bl-sm' : 'bg-white border border-gray-300 text-darkCharcoal rounded-bl-sm')}`}>{msg.text}</div>
+                                        </div>
+                                    ))}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                                <form onSubmit={handleSend} className={`p-3 border-t flex gap-2 ${theme === 'dark' ? 'bg-dark/80 border-gray-800' : 'bg-white/80 border-gray-300'}`}>
+                                    <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask about packages, budget..." className={`flex-1 bg-transparent text-sm outline-none px-2 ${theme === 'dark' ? 'text-cream' : 'text-darkCharcoal'}`} />
+                                    <button type="submit" className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-softGold/20 text-softGold hover:bg-softGold hover:text-dark' : 'bg-vintageBrown/20 text-vintageBrown hover:bg-vintageBrown hover:text-warmBeige'}`}>
+                                        <svg className="w-4 h-4 transform rotate-90" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                                    </button>
+                                </form>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </>
+            );
+        };
+
+        const Ecosystem = ({ onNavigate }) => {
+            const { theme } = useContext(ThemeContext);
+            const brands = [
+                {
+                    title: "NH Creative",
+                    desc: "The core studio. Premium digital experiences & branding.",
+                    icon: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
+                    accent: theme === 'dark' ? "from-gray-700/20" : "from-gray-400/20",
+                    btnText: "Explore NH Creative",
+                    action: () => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+                },
+                {
+                    title: "NH PixelHive",
+                    desc: "Curated digital products, UI kits, and creative assets.",
+                    icon: "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4",
+                    accent: theme === 'dark' ? "from-blue-900/20" : "from-blue-600/10",
+                    btnText: "Explore NH PixelHive",
+                    action: () => { window.scrollTo(0,0); onNavigate('pixelhive'); }
+                },
+                {
+                    title: "NHVitation",
+                    desc: "Immersive, bespoke digital wedding invitation websites.",
+                    icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318z",
+                    accent: theme === 'dark' ? "from-rose-900/20" : "from-rose-600/10",
+                    btnText: "Live Preview",
+                    action: () => { window.scrollTo(0,0); onNavigate('nhvitation'); }
+                }
+            ];
+
+            return (
+                <section id="ecosystem" className="py-32 relative z-10">
+                    <div className="container mx-auto px-6 md:px-12">
+                        <SectionHeading title="Brand Ecosystem" subtitle="The Universe" />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {brands.map((brand, idx) => (
+                                <motion.div key={idx} onClick={brand.action} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, delay: idx * 0.2 }} className={`group relative h-[400px] rounded-2xl overflow-hidden flex flex-col p-10 cursor-pointer border transition-all duration-700 interactive ${theme==='dark' ? 'glass-dark hover:border-softGold/50' : 'glass-light hover:border-vintageBrown/50'}`}>
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${brand.accent} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`}></div>
+                                    <div className={`w-16 h-16 rounded-full border flex items-center justify-center mb-10 transition-all duration-500 ${theme==='dark' ? 'border-gray-700 bg-black/50 group-hover:border-softGold group-hover:bg-softGold/10 text-gray-400 group-hover:text-softGold' : 'border-gray-300 bg-white/50 group-hover:border-vintageBrown group-hover:bg-vintageBrown/10 text-gray-500 group-hover:text-vintageBrown'}`}>
+                                        <svg className="w-8 h-8 transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" d={brand.icon}></path></svg>
+                                    </div>
+                                    <h3 className={`font-serif text-3xl font-semibold mb-4 transition-colors ${theme==='dark' ? 'text-cream group-hover:text-white' : 'text-darkCharcoal group-hover:text-black'}`}>{brand.title}</h3>
+                                    <p className={`text-sm leading-relaxed font-light ${theme==='dark' ? 'text-gray-400' : 'text-gray-600'}`}>{brand.desc}</p>
+                                    <div className={`mt-auto flex items-center text-xs uppercase tracking-widest font-medium opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ${theme==='dark' ? 'text-softGold' : 'text-vintageBrown'}`}>
+                                        {brand.btnText} <span className="ml-2">→</span>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const PremiumServices = ({ onNavigate }) => {
+            const { theme } = useContext(ThemeContext);
+            const services = [
+                {
+                    title: "Digital Invitation Website",
+                    desc: "Premium digital invitation websites for weddings and luxury events.",
+                    features: ["Responsive design", "RSVP system", "Music support", "Gallery", "Countdown timer", "Guest management"],
+                    actionText: "Live Preview",
+                    action: () => { window.scrollTo(0,0); onNavigate('nhvitation'); }
+                },
+                {
+                    title: "Landing Page Development",
+                    desc: "High-converting landing pages designed to increase leads, sales, and conversions.",
+                    features: ["Conversion Optimized", "Fast Loading", "SEO Friendly", "WhatsApp Integration", "Analytics Ready", "AI Assisted Copywriting"],
+                    actionText: "Request Landing Page",
+                    action: () => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })
+                },
+                {
+                    title: "Professional Web Development",
+                    desc: "Bespoke company profiles, portfolios, and enterprise business websites.",
+                    features: ["Modern UI/UX", "Mobile Friendly", "SEO Optimized", "Secure Development", "Easy Maintenance", "AI Assisted Workflow"],
+                    actionText: "Start Project",
+                    action: () => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })
+                },
+                {
+                    title: "Graphic & Brand Design",
+                    desc: "Crafting visual identities, social media aesthetics, and marketing collateral.",
+                    features: ["Branding", "Social Media Design", "Marketing Design", "Visual Identity", "Posters & Banners"],
+                    actionText: "Request Design",
+                    action: () => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })
+                },
+                {
+                    title: "Digital Products",
+                    desc: "Premium templates, mockups, UI kits, and creative assets by NH PixelHive.",
+                    features: ["Templates", "Mockups", "UI Kits", "Creative Assets", "Design Resources"],
+                    actionText: "Explore NH PixelHive",
+                    action: () => { window.scrollTo(0,0); onNavigate('pixelhive'); }
+                }
+            ];
+
+            return (
+                <section id="services" className="py-32 relative z-10">
+                    <div className="container mx-auto px-6 md:px-12">
+                        <SectionHeading title="Premium Ecosystem" subtitle="Our Services" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {services.map((srv, idx) => (
+                                <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, delay: idx * 0.1 }} className={`p-10 flex flex-col rounded-2xl group interactive transition-all duration-500 border relative overflow-hidden ${theme==='dark'?'glass-dark hover:border-softGold/50':'glass-light hover:border-vintageBrown/50'}`}>
+                                    <div className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 ${theme==='dark'?'bg-softGold/10':'bg-vintageBrown/10'}`}></div>
+                                    <h4 className={`font-serif text-2xl mb-4 transition-colors relative z-10 ${theme==='dark'?'text-cream group-hover:text-softGold':'text-darkCharcoal group-hover:text-vintageBrown'}`}>{srv.title}</h4>
+                                    <p className={`text-sm mb-8 font-light relative z-10 ${theme==='dark'?'text-gray-400':'text-gray-600'}`}>{srv.desc}</p>
+                                    <ul className="mb-10 space-y-3 relative z-10">
+                                        {srv.features.map((feature, fIdx) => (
+                                            <li key={fIdx} className="flex items-center text-xs">
+                                                <svg className={`w-4 h-4 mr-3 flex-shrink-0 ${theme==='dark'?'text-softGold':'text-vintageBrown'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                                <span className={theme==='dark'?'text-gray-300':'text-gray-700'}>{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="mt-auto relative z-10">
+                                        <button onClick={srv.action} className={`w-full py-4 text-xs tracking-widest uppercase font-bold border transition-all duration-300 ${theme==='dark'?'border-gray-700 text-cream hover:bg-softGold hover:text-dark hover:border-softGold':'border-gray-300 text-darkCharcoal hover:bg-vintageBrown hover:text-warmBeige hover:border-vintageBrown'}`}>
+                                            {srv.actionText}
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const TrustAndSecurity = () => {
+            const { theme } = useContext(ThemeContext);
+            const badges = ["Aman & Terpercaya", "Support AI Technology", "Modern Technology", "Responsive Design", "SEO Friendly", "Secure Development", "Fast Support", "Long-Term Partnership"];
+            const securityFeatures = ["HTTPS", "Spam Protection", "CAPTCHA", "Secure Forms", "Rate Limiting", "XSS Protection", "CSRF Protection", "Cloudflare Ready"];
+
+            return (
+                <section className={`py-32 relative z-10 border-y ${theme==='dark'?'border-gray-900 bg-black/40':'border-gray-300 bg-white/40'}`}>
+                    <div className="container mx-auto px-6 md:px-12">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                            <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+                                <span className={`uppercase tracking-[0.3em] text-[10px] font-bold mb-4 block ${theme==='dark'?'text-softGold':'text-vintageBrown'}`}>Why Choose NH Creative</span>
+                                <h3 className={`font-serif text-4xl mb-8 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>Built on Trust & <br/><span className="italic">AI Assisted Excellence</span></h3>
+                                <p className={`text-sm leading-relaxed mb-10 font-light ${theme==='dark'?'text-gray-400':'text-gray-600'}`}>
+                                    Experience a seamless blend of human creativity and artificial intelligence. Our AI Smart Recommendation system and Chat Assistant ensure you get the exact strategic guidance, budget estimations, and service matching instantly.
+                                </p>
+                                <div className="flex flex-wrap gap-3">
+                                    {badges.map((badge, i) => (
+                                        <div key={i} className={`px-4 py-2 text-[10px] uppercase tracking-widest rounded-full border flex items-center gap-2 ${theme==='dark'?'border-gray-700 text-gray-300 bg-dark/50':'border-gray-300 text-gray-700 bg-white/50'}`}>
+                                            <svg className={`w-3 h-3 ${theme==='dark'?'text-softGold':'text-vintageBrown'}`} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>
+                                            {badge}
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className={`p-10 rounded-3xl border ${theme==='dark'?'glass-dark border-gray-800':'glass-light border-gray-200'}`}>
+                                <span className={`uppercase tracking-[0.3em] text-[10px] font-bold mb-4 block ${theme==='dark'?'text-softGold':'text-vintageBrown'}`}>Infrastructure</span>
+                                <h3 className={`font-serif text-3xl mb-6 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>Safe, Secure & Trusted</h3>
+                                <p className={`text-sm mb-8 font-light ${theme==='dark'?'text-gray-400':'text-gray-600'}`}>NH Creative develops websites using modern development standards to ensure reliability, performance, and enterprise-grade security.</p>
+                                <ul className="grid grid-cols-2 gap-4">
+                                    {securityFeatures.map((sec, i) => (
+                                        <li key={i} className="flex items-center text-xs">
+                                            <div className={`w-5 h-5 rounded flex items-center justify-center mr-3 ${theme==='dark'?'bg-gray-800 text-softGold':'bg-gray-200 text-vintageBrown'}`}>
+                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                                            </div>
+                                            <span className={theme==='dark'?'text-gray-300':'text-gray-700'}>{sec}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </motion.div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const ClientSupport = () => {
+            const { theme } = useContext(ThemeContext);
+            const supports = ["Consultation Support", "Technical Support", "Revision Support", "Maintenance Support", "After Sales Support"];
+            return (
+                <section className="py-24 relative z-10">
+                    <div className="container mx-auto px-6 text-center">
+                        <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className={`font-serif text-2xl md:text-4xl italic max-w-4xl mx-auto leading-relaxed mb-12 ${theme==='dark'?'text-gray-400':'text-gray-500'}`}>
+                            "Not only building websites, but building <span className={theme==='dark'?'text-cream':'text-darkCharcoal'}>long-term partnerships.</span>"
+                        </motion.p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            {supports.map((sup, idx) => (
+                                <motion.div key={idx} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: idx * 0.1 }} className={`px-6 py-4 rounded-xl border text-xs tracking-widest uppercase font-medium shadow-sm transition-colors ${theme==='dark'?'glass-dark border-gray-800 text-gray-300 hover:border-softGold':'glass-light border-gray-200 text-gray-700 hover:border-vintageBrown'}`}>
+                                    {sup}
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const IndustrialBackground = () => {
+            const containerRef = useRef();
+
+            useEffect(() => {
+                if(!containerRef.current) return;
+                const scene = new THREE.Scene();
+                scene.fog = new THREE.FogExp2(0x050505, 0.02);
+                
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
+                camera.position.z = 10;
+                
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                containerRef.current.appendChild(renderer.domElement);
+
+                // Floating Metal Cubes
+                const geo = new THREE.BoxGeometry(1, 1, 1);
+                const mat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.2, metalness: 0.8, wireframe: true });
+                const cubes = [];
+                for(let i=0; i<20; i++) {
+                    const cube = new THREE.Mesh(geo, mat);
+                    cube.position.set((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*10 - 5);
+                    cube.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+                    scene.add(cube);
+                    cubes.push(cube);
+                }
+
+                const light = new THREE.PointLight(0xb87333, 2, 50); // Copper gold light
+                light.position.set(0, 0, 5);
+                scene.add(light);
+                scene.add(new THREE.AmbientLight(0x222222));
+
+                let mouseX = 0, mouseY = 0;
+                const handleMouseMove = (e) => { mouseX = (e.clientX - window.innerWidth/2)*0.01; mouseY = (e.clientY - window.innerHeight/2)*0.01; };
+                window.addEventListener('mousemove', handleMouseMove);
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    cubes.forEach((c, i) => { c.rotation.x += 0.002; c.rotation.y += 0.003; c.position.y += Math.sin(Date.now()*0.001 + i)*0.005; });
+                    camera.position.x += (mouseX - camera.position.x) * 0.05;
+                    camera.position.y += (-mouseY - camera.position.y) * 0.05;
+                    camera.lookAt(scene.position);
+                    renderer.render(scene, camera);
+                };
+                animate();
+
+                const handleResize = () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
+                window.addEventListener('resize', handleResize);
+
+                return () => {
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('resize', handleResize);
+                    containerRef.current?.removeChild(renderer.domElement);
+                };
+            }, []);
+
+            return <div ref={containerRef} className="absolute inset-0 z-0 pointer-events-none opacity-40"></div>;
+        };
+
+        const ProductModal = ({ product, onClose }) => {
+            const [activeMedia, setActiveMedia] = useState(0);
+            
+            useEffect(() => {
+                document.body.style.overflow = 'hidden';
+                return () => { document.body.style.overflow = 'unset'; };
+            }, []);
+            
+            if (!product) return null;
+
+            const modalContent = (
+                <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-10"
+                >
+                    <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-sm" onClick={onClose}></div>
+                    
+                    <motion.div 
+                        initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 400 }}
+                        className="relative w-full max-w-7xl max-h-[90vh] bg-[#141414]/90 border border-[#b87333]/30 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(184,115,51,0.1)] flex flex-col lg:flex-row"
+                    >
+                        <button onClick={onClose} className="absolute top-4 right-4 md:top-6 md:right-6 z-50 p-2 bg-black/50 border border-gray-700 hover:border-[#b87333] hover:text-[#b87333] rounded-full text-white transition-colors shadow-lg">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+
+                        <div className="w-full lg:w-3/5 bg-black/80 relative border-b lg:border-b-0 lg:border-r border-[#b87333]/20 flex flex-col">
+                            <div className="flex-1 relative flex items-center justify-center p-6 min-h-[250px] md:min-h-[300px]">
+                                {product.media[activeMedia].type === 'video' ? (
+                                    <video src={product.media[activeMedia].url} autoPlay loop muted className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+                                ) : (
+                                    <img src={product.media[activeMedia].url} alt="Preview" className="max-w-full max-h-[40vh] lg:max-h-full object-contain rounded-lg shadow-2xl" />
+                                )}
+                            </div>
+                            <div className="p-4 flex gap-4 overflow-x-auto border-t border-[#b87333]/10 bg-black/60">
+                                {product.media.map((med, i) => (
+                                    <button 
+                                        key={i} onClick={() => setActiveMedia(i)}
+                                        className={`flex-shrink-0 w-16 h-12 md:w-20 md:h-16 rounded border overflow-hidden transition-all ${activeMedia === i ? 'border-[#b87333] opacity-100' : 'border-gray-800 opacity-50 hover:opacity-100'}`}
+                                    >
+                                        {med.type === 'video' ? (
+                                            <div className="w-full h-full bg-gray-900 flex items-center justify-center"><svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg></div>
+                                        ) : (
+                                            <img src={med.url} className="w-full h-full object-cover" />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="w-full lg:w-2/5 p-6 md:p-8 lg:p-12 overflow-y-auto">
+                            <span className="text-[10px] text-[#b87333] uppercase tracking-[0.3em] font-bold">{product.category}</span>
+                            <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-white mt-2 mb-4">{product.title}</h2>
+                            <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-6 md:mb-8">{product.desc}</p>
+
+                            <div className="space-y-4 md:space-y-6 mb-8 md:mb-10">
+                                <div>
+                                    <h4 className="text-white text-[10px] md:text-xs uppercase tracking-widest font-bold mb-3 border-b border-gray-800 pb-2">Features</h4>
+                                    <ul className="space-y-2">
+                                        {product.features.map((f, i) => (
+                                            <li key={i} className="text-gray-400 text-xs md:text-sm flex items-center gap-2"><span className="text-[#b87333]">✓</span> {f}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Formats</h4>
+                                        <div className="text-gray-300 text-xs md:text-sm">{product.formats.join(', ')}</div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">License</h4>
+                                        <div className="text-gray-300 text-xs md:text-sm">{product.license}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-auto pt-6 border-t border-gray-800 flex flex-col gap-3 md:gap-4">
+                                <div className="flex justify-between items-end mb-2">
+                                    <span className="text-gray-500 text-[10px] md:text-xs uppercase tracking-widest">Investment</span>
+                                    <span className="text-2xl md:text-3xl font-serif text-[#b87333]">{product.price}</span>
+                                </div>
+                                <button onClick={() => window.open('https://lynk.id/nhcreative', '_blank')} className="w-full py-3 md:py-4 bg-[#b87333] hover:bg-[#a06020] text-white text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-[0_0_15px_rgba(184,115,51,0.3)]">
+                                    Continue to Secure Payment
+                                </button>
+                                <button className="w-full py-3 md:py-4 border border-gray-700 hover:border-gray-500 text-gray-300 text-[10px] md:text-xs uppercase tracking-[0.2em] transition-all">
+                                    Contact Seller
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            );
+
+            return createPortal(modalContent, document.body);
+        };
+
+        const PixelHiveExperience = ({ onBack }) => {
+            const [selectedProduct, setSelectedProduct] = useState(null);
+            const products = [
+                { 
+                    title: "ALL IN ONE PACKAGE – ENGAGEMENT + WEDDING PLANNER", category: "Wedding", price: "Rp 79.000",
+                    desc: "AA complete solution for your special moments, from the engagement ceremony to your wedding day. Enjoy professional planning, coordination, and full assistance to ensure every moment runs smoothly, beautifully, and stress-free.",
+                    features: ["200+ Responsive Components", "Auto-layout enabled", "Dark & Light modes included", "Global typography & color styles"],
+                    formats: ["Spreadsheet", "Google Sheet"], license: "Lifetime",
+                    media: [
+                        { type: 'image', url: 'https://res.cloudinary.com/dsqqutdgv/image/upload/v1782138867/Poster-1782138358_tr3sbp.png' },
+                        { type: 'image', url: 'https://cdn.lynkid.my.id/products/16-10-2025/1760577820931_3072302.png' },
+                        { type: 'video', url: 'https://res.cloudinary.com/dsqqutdgv/video/upload/v1782139576/slendro_ai_1782139547945_wjrmcs.mp4' }
+                    ]
+                },
+                { 
+                    title: "Elysian Minimalist UI Kit", category: "UI Kits", price: "Rp 250.000",
+                    desc: "A comprehensive, pixel-perfect UI kit designed for premium agencies and luxury brands. Built with modularity in mind.",
+                    features: ["200+ Responsive Components", "Auto-layout enabled", "Dark & Light modes included", "Global typography & color styles"],
+                    formats: ["Figma", "Sketch"], license: "Extended Commercial",
+                    media: [
+                        { type: 'image', url: 'https://cdn.lynkid.my.id/products/16-10-2025/1760577820931_3072302.png' },
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/ffffff?text=Dashboard+View' },
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/ffffff?text=Mobile+View' }
+                    ]
+                },
+                { 
+                    title: "Vintage Industrial Mockups", category: "Mockups", price: "Rp 150.000",
+                    desc: "High-resolution photographic mockups featuring raw materials, concrete, and rusted metal textures to showcase your boldest designs.",
+                    features: ["4K Resolution (4000x3000px)", "Smart Object integration", "Separated shadows and highlights", "6 Unique industrial scenes"],
+                    formats: ["PSD"], license: "Standard Commercial",
+                    media: [
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/b87333?text=Industrial+Mockup+1' },
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/ffffff?text=Scene+2' }
+                    ]
+                },
+                { 
+                    title: "Agency Next.js Template", category: "Templates", price: "Rp 450.000",
+                    desc: "A fully coded, production-ready React/Next.js template featuring Framer Motion animations and GSAP scroll effects out of the box.",
+                    features: ["Next.js 14 App Router", "Tailwind CSS styling", "Smooth Lenis Scrolling", "SEO Optimized structure"],
+                    formats: ["React", "Next.js", "TS"], license: "Single Project",
+                    media: [
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/b87333?text=Next.js+Template' },
+                        { type: 'video', url: 'https://www.w3schools.com/html/mov_bbb.mp4' }
+                    ]
+                },
+                { 
+                    title: "Cinematic LUTs Pack", category: "Assets", price: "Rp 100.000",
+                    desc: "Professional color grading presets to give your photos and videos that dramatic, high-contrast editorial look instantly.",
+                    features: ["15 Premium .cube files", "Works in Premiere, DaVinci, FCPX", "Log to Rec709 conversion", "Skin tone protection"],
+                    formats: [".CUBE"], license: "Unlimited Commercial",
+                    media: [
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/b87333?text=Cinematic+LUTs' }
+                    ]
+                },
+                { 
+                    title: "Dark Matter 3D Icons", category: "3D Assets", price: "Rp 200.000",
+                    desc: "A collection of 50+ premium 3D icons with dark, glassmorphic, and metallic textures perfect for modern Web3 or agency websites.",
+                    features: ["50+ Unique Objects", "High-res PNG with transparent backgrounds", "Original Blender (.blend) files included", "Multiple lighting setups"],
+                    formats: ["PNG", "BLEND"], license: "Standard Commercial",
+                    media: [
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/b87333?text=Dark+Matter+3D' },
+                        { type: 'image', url: 'https://placehold.co/800x600/141414/ffffff?text=Angles+View' }
+                    ]
+                }
+            ];
+
+            return (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen bg-[#050505] text-white font-sans relative z-[100] overflow-x-hidden">
+                    <IndustrialBackground />
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] pointer-events-none z-10 mix-blend-overlay"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505] z-10 pointer-events-none"></div>
+
+                    <nav className="relative z-20 p-6 flex justify-between items-center border-b border-white/5 bg-black/50 backdrop-blur-md">
+                        <div className="flex items-center gap-4">
+                            <button onClick={onBack} className="p-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors interactive">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            </button>
+                            <div className="flex items-center">
+    <img 
+        src="https://res.cloudinary.com/dsqqutdgv/image/upload/v1776667950/LOGO_NH_mtsgjt.png" 
+        alt="NH PixelHive Logo" 
+        className="h-8 w-auto object-contain" 
+    />
+</div>
+                        <div className="text-[10px] uppercase tracking-widest text-[#b87333] font-bold border border-[#b87333]/30 px-4 py-2 rounded shadow-[inset_0_0_10px_rgba(184,115,51,0.1)]">
+                            Industrial Hub
+                        </div>
+                    </nav>
+
+                    <div className="container mx-auto px-6 py-32 relative z-20">
+                        <div className="text-center mb-32 relative">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#b87333]/10 blur-[120px] rounded-full pointer-events-none"></div>
+                            <span className="text-[#b87333] uppercase tracking-[0.4em] text-[10px] font-bold mb-6 block">The Marketplace</span>
+                            <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-white drop-shadow-2xl">
+                                Digital Assets Crafted <br className="hidden md:block"/><span className="italic text-gray-400 font-light">for Creative Minds.</span>
+                            </h1>
+                            <p className="text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">Premium digital resources, industrial templates, and creative tools engineered for the modern studio. Accelerate your workflow with pixel-perfect precision.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
+                            {products.map((prod, i) => (
+                                <motion.div 
+                                    key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                                    className="group rounded-2xl bg-[#0a0a0a]/80 border border-white/5 overflow-hidden hover:border-[#b87333]/40 transition-all duration-500 shadow-2xl backdrop-blur-sm interactive"
+                                >
+                                    <div className="h-80 bg-[#111] relative overflow-hidden flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-[#b87333]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                                        <div className="w-48 h-48 border border-[#b87333]/20 rounded-lg transform group-hover:rotate-12 group-hover:scale-110 transition-transform duration-700 bg-black/50 backdrop-blur-md shadow-[0_0_30px_rgba(184,115,51,0.1)] flex items-center justify-center overflow-hidden">
+                                            <img src={prod.media[0].url} alt={prod.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                    </div>
+                                    <div className="p-8 md:p-10 relative">
+                                        <div className="absolute top-0 left-10 right-10 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <span className="text-[10px] text-[#b87333] uppercase tracking-widest font-bold">{prod.category}</span>
+                                                <h3 className="font-serif text-2xl md:text-3xl mt-2 text-white group-hover:text-[#b87333] transition-colors">{prod.title}</h3>
+                                            </div>
+                                            <span className="text-lg font-mono text-gray-400">{prod.price}</span>
+                                        </div>
+                                        <div className="flex gap-4 mt-8">
+                                            <button onClick={() => setSelectedProduct(prod)} className="flex-1 py-4 bg-white/5 hover:bg-[#b87333] border border-white/10 hover:border-[#b87333] text-white font-bold text-[10px] uppercase tracking-widest transition-all">
+                                                Quick View
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    <AnimatePresence>
+                        {selectedProduct && <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
+                    </AnimatePresence>
+                </motion.div>
+            );
+        };
+
+        const Portfolio = () => {
+            const { theme } = useContext(ThemeContext);
+            const projects = [
+                { id: 1, title: "Aether Cosmetics", cat: "Brand Identity", style: "md:col-span-2 md:row-span-2 h-[600px]" },
+                { id: 2, title: "Lumina Gala", cat: "NHVitation", style: "h-[285px]" },
+                { id: 3, title: "Nexus App UI", cat: "UI/UX Design", style: "h-[285px]" },
+                { id: 4, title: "Elysian Pack", cat: "NH PixelHive", style: "h-[400px]" },
+                { id: 5, title: "Royal Decree", cat: "NHVitation", style: "md:col-span-2 h-[400px]" },
+            ];
+
+            return (
+                <section id="portfolio" className="py-32 relative z-10">
+                    <div className="container mx-auto px-6 md:px-12">
+                        <SectionHeading title="Selected Works" subtitle="Portfolio" />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-auto">
+                            {projects.map((project, idx) => (
+                                <motion.div key={project.id} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, delay: idx * 0.1 }} className={`group relative overflow-hidden rounded-xl cursor-pointer interactive ${project.style} ${theme==='dark'?'bg-gray-900':'bg-gray-300'}`}>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black group-hover:scale-105 transition-transform duration-1000 ease-out" style={{ backgroundImage: theme==='dark' ? 'linear-gradient(to bottom right, #1f2937, #000)' : 'linear-gradient(to bottom right, #d1d5db, #9ca3af)' }}>
+                                         <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')]"></div>
+                                    </div>
+                                    <div className={`absolute inset-0 opacity-80 group-hover:opacity-90 transition-opacity duration-500 ${theme==='dark'?'bg-gradient-to-t from-black via-transparent to-transparent':'bg-gradient-to-t from-black/70 via-transparent to-transparent'}`}></div>
+                                    <div className="absolute inset-0 p-8 flex flex-col justify-end translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                        <div className="overflow-hidden">
+                                            <span className={`text-[10px] uppercase tracking-[0.2em] font-medium block mb-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 delay-100 ${theme==='dark'?'text-softGold':'text-warmBeige'}`}>{project.cat}</span>
+                                        </div>
+                                        <h3 className="font-serif text-2xl md:text-3xl text-white">{project.title}</h3>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Achievements = () => {
+            const { theme } = useContext(ThemeContext);
+            const stats = [
+                { num: 150, label: "Projects Completed", suffix: "+" },
+                { num: 45, label: "Happy Clients", suffix: "" },
+                { num: 5, label: "Years Experience", suffix: "+" },
+                { num: 200, label: "Creative Assets", suffix: "+" }
+            ];
+
+            return (
+                <section className="py-24 relative z-10 border-y border-white/5" style={{ borderColor: theme==='dark'?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)' }}>
+                    <div className="container mx-auto px-6 md:px-12">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+                            {stats.map((stat, idx) => (
+                                <motion.div key={idx} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: idx * 0.1 }}>
+                                    <div className={`font-serif text-5xl md:text-7xl mb-2 ${theme==='dark'?'text-softGold':'text-vintageBrown'}`}>{stat.num}{stat.suffix}</div>
+                                    <div className={`text-xs uppercase tracking-widest ${theme==='dark'?'text-gray-400':'text-gray-600'}`}>{stat.label}</div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Testimonials = () => {
+            const { theme } = useContext(ThemeContext);
+            const items = [
+                "NH Creative elevated our brand beyond expectations. Truly a premium experience.",
+                "The attention to detail in our digital invitation was breathtaking. Highly recommend NHVitation.",
+                "Their UI kits from PixelHive saved us weeks of design work without compromising quality.",
+                "A visionary team that understands the intersection of art and digital engineering."
+            ];
+
+            return (
+                <section className="py-32 relative z-10 overflow-hidden">
+                    <SectionHeading title="Client Voices" subtitle="Testimonials" />
+                    <div className="relative flex overflow-x-hidden w-full mt-10">
+                        <div className="animate-marquee whitespace-nowrap flex items-center">
+                            {items.map((text, idx) => (
+                                <div key={idx} className={`mx-8 text-2xl md:text-4xl font-serif italic ${theme==='dark'?'text-gray-500':'text-gray-400'}`}>
+                                    "{text}" <span className={`mx-8 text-sm not-italic font-sans ${theme==='dark'?'text-softGold':'text-vintageBrown'}`}>— Client</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="absolute top-0 animate-marquee2 whitespace-nowrap flex items-center">
+                            {items.map((text, idx) => (
+                                <div key={idx} className={`mx-8 text-2xl md:text-4xl font-serif italic ${theme==='dark'?'text-gray-500':'text-gray-400'}`}>
+                                    "{text}" <span className={`mx-8 text-sm not-italic font-sans ${theme==='dark'?'text-softGold':'text-vintageBrown'}`}>— Client</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const CreativeJournal = () => {
+            const { theme } = useContext(ThemeContext);
+            return (
+                <section id="journal" className={`py-32 relative z-10 ${theme==='dark'?'bg-darkCharcoal':'bg-[#E8E0D5]'}`}>
+                    <div className="container mx-auto px-6 md:px-12">
+                        <SectionHeading title="Creative Journal" subtitle="Editorial" center={false} />
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+                            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="lg:col-span-2 group cursor-pointer interactive">
+                                <div className="h-[400px] md:h-[500px] rounded-xl overflow-hidden relative mb-6">
+                                    <div className="absolute inset-0 bg-gray-800 group-hover:scale-105 transition-transform duration-1000" style={{ backgroundImage: theme==='dark' ? 'linear-gradient(45deg, #1f2937, #374151)' : 'linear-gradient(45deg, #d1d5db, #f3f4f6)' }}></div>
+                                    <div className="absolute top-6 left-6 px-3 py-1 bg-white/10 backdrop-blur-md rounded border border-white/20 text-xs text-white uppercase tracking-widest">Case Study</div>
+                                </div>
+                                <div className="flex gap-4 items-center text-xs uppercase tracking-widest text-gray-500 mb-3">
+                                    <span>Oct 24, 2026</span><span className={`w-1 h-1 rounded-full ${theme==='dark'?'bg-softGold':'bg-vintageBrown'}`}></span><span>5 Min Read</span>
+                                </div>
+                                <h3 className={`font-serif text-3xl md:text-4xl mb-4 group-hover:underline decoration-1 underline-offset-8 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>The Psychology of Minimalist Luxury in Web Design</h3>
+                                <p className={`font-light max-w-2xl line-clamp-2 ${theme==='dark'?'text-gray-400':'text-gray-600'}`}>Exploring how white space, deliberate typography, and subtle motion create a perception of high value and exclusivity in modern digital platforms.</p>
+                            </motion.div>
+                            <div className="flex flex-col gap-8">
+                                {[1, 2].map((i) => (
+                                    <motion.div key={i} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.2 }} className="group cursor-pointer interactive flex flex-col">
+                                        <div className="h-48 rounded-xl overflow-hidden relative mb-4">
+                                            <div className="absolute inset-0 bg-gray-800 group-hover:scale-105 transition-transform duration-1000" style={{ backgroundImage: theme==='dark' ? 'linear-gradient(135deg, #111827, #1f2937)' : 'linear-gradient(135deg, #9ca3af, #d1d5db)' }}></div>
+                                        </div>
+                                        <div className="flex gap-4 items-center text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                            <span>Sep 12, 2026</span>
+                                        </div>
+                                        <h4 className={`font-serif text-xl group-hover:underline decoration-1 underline-offset-4 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>
+                                            {i === 1 ? "Trends in Digital Wedding Invitations" : "Building a Scalable UI Kit Architecture"}
+                                        </h4>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Collaboration = () => {
+            const { theme } = useContext(ThemeContext);
+            const [formData, setFormData] = useState({ name: '', email: '', type: '', budget: '', message: '', botField: '', captcha: '' });
+            const [captchaValues, setCaptchaValues] = useState({ a: 0, b: 0 });
+            const [status, setStatus] = useState('idle');
+
+            useEffect(() => {
+                setCaptchaValues({ a: Math.floor(Math.random() * 5) + 1, b: Math.floor(Math.random() * 5) + 1 });
+            }, []);
+
+            const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+            const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Anti-Spam Honeypot
+    if (formData.botField) { console.warn("Spam bot detected!"); return; }
+
+    // Math Captcha Validation
+    if (parseInt(formData.captcha) !== (captchaValues.a + captchaValues.b)) {
+        alert("Verifikasi keamanan salah. Silakan coba lagi.");
+        return;
+    }
+
+    setStatus('loading');
+    
+    // --- INTEGRASI KE EMAIL ---
+    // Masukkan URL dari Formspree atau Web3Forms di bawah ini:
+    fetch("https://formspree.io/f/mzdlbgya", { 
+        method: "POST", 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(formData) 
+    })
+    .then(response => {
+        if(response.ok) {
+            // Jika berhasil terkirim ke email
+            setStatus('success');
+            setFormData({ name: '', email: '', type: '', budget: '', message: '', botField: '', captcha: '' });
+            setCaptchaValues({ a: Math.floor(Math.random() * 5) + 1, b: Math.floor(Math.random() * 5) + 1 });
+            setTimeout(() => setStatus('idle'), 5000);
+        } else {
+            // Jika error
+            alert("Maaf, terjadi kesalahan server. Coba lagi nanti.");
+            setStatus('idle');
+        }
+    })
+    .catch(error => {
+        alert("Gagal mengirim pesan. Periksa koneksi internet Anda.");
+        setStatus('idle');
+    });
+};
+
+            return (
+                <section id="contact" className="py-32 relative z-10">
+                    <div className="container mx-auto px-6 md:px-12">
+                        <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className={`max-w-5xl mx-auto rounded-3xl p-10 md:p-20 relative overflow-hidden border ${theme==='dark' ? 'glass-dark border-softGold/20' : 'glass-light border-vintageBrown/20'}`}>
+                            <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 ${theme==='dark' ? 'bg-softGold/10' : 'bg-vintageBrown/10'}`}></div>
+
+                            <div className="text-center relative z-10 mb-16">
+                                <span className={`uppercase tracking-[0.3em] text-[10px] font-bold mb-4 block ${theme==='dark'?'text-softGold':'text-vintageBrown'}`}>Partnership</span>
+                                <h2 className={`font-serif text-4xl md:text-6xl mb-6 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>Let's Build Something <br/><span className="italic">Extraordinary.</span></h2>
+                                <p className={`font-light max-w-lg mx-auto ${theme==='dark'?'text-gray-400':'text-gray-600'}`}>Whether you are looking for a creative partner, a bespoke digital platform, or a collaboration opportunity.</p>
+                            </div>
+
+                            {status === 'success' ? (
+                                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center relative z-10 py-10">
+                                    <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 ${theme==='dark'?'bg-softGold/20 text-softGold':'bg-vintageBrown/20 text-vintageBrown'}`}>
+                                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <h3 className={`font-serif text-3xl mb-4 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>Inquiry Received</h3>
+                                    <p className={theme==='dark'?'text-gray-400':'text-gray-600'}>Thank you for reaching out. Our team will contact you shortly.</p>
+                                </motion.div>
+                            ) : (
+                                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                                    <input type="text" name="botField" value={formData.botField} onChange={handleChange} style={{ display: 'none' }} tabIndex="-1" autoComplete="off" />
+                                    
+                                    <input required type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className={`w-full bg-transparent border-b p-4 outline-none transition-colors ${theme==='dark'?'border-gray-700 text-cream focus:border-softGold':'border-gray-400 text-darkCharcoal focus:border-vintageBrown'}`} />
+                                    <input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email Address" className={`w-full bg-transparent border-b p-4 outline-none transition-colors ${theme==='dark'?'border-gray-700 text-cream focus:border-softGold':'border-gray-400 text-darkCharcoal focus:border-vintageBrown'}`} />
+                                    <select required name="type" value={formData.type} onChange={handleChange} className={`w-full bg-transparent border-b p-4 outline-none appearance-none transition-colors ${theme==='dark'?'border-gray-700 text-gray-400 focus:border-softGold':'border-gray-400 text-gray-600 focus:border-vintageBrown'}`}>
+                                        <option value="" disabled>Project Type</option>
+                                        <option value="brand">Brand Identity</option>
+                                        <option value="web">Website & Digital Experience</option>
+                                        <option value="wedding">Digital Wedding Invitation</option>
+                                        <option value="partner">Partnership & Affiliate</option>
+                                    </select>
+                                    <input type="text" name="budget" value={formData.budget} onChange={handleChange} placeholder="Budget Range (Optional)" className={`w-full bg-transparent border-b p-4 outline-none transition-colors ${theme==='dark'?'border-gray-700 text-cream focus:border-softGold':'border-gray-400 text-darkCharcoal focus:border-vintageBrown'}`} />
+                                    <textarea required name="message" value={formData.message} onChange={handleChange} placeholder="Tell us about your vision..." rows="3" className={`w-full md:col-span-2 bg-transparent border-b p-4 outline-none resize-none transition-colors ${theme==='dark'?'border-gray-700 text-cream focus:border-softGold':'border-gray-400 text-darkCharcoal focus:border-vintageBrown'}`}></textarea>
+                                    
+                                    <div className="md:col-span-2 flex items-center gap-4 bg-black/10 p-4 rounded-lg">
+                                        <span className={`text-sm font-medium ${theme==='dark'?'text-gray-300':'text-gray-700'}`}>Keamanan: Berapa {captchaValues.a} + {captchaValues.b}?</span>
+                                        <input required type="number" name="captcha" value={formData.captcha} onChange={handleChange} placeholder="Jawaban" className={`w-24 bg-transparent border-b p-2 outline-none text-center transition-colors ${theme==='dark'?'border-gray-700 text-cream focus:border-softGold':'border-gray-400 text-darkCharcoal focus:border-vintageBrown'}`} />
+                                    </div>
+
+                                    <div className="md:col-span-2 flex justify-center mt-6">
+                                        <button type="submit" disabled={status === 'loading'} className={`px-12 py-4 font-bold tracking-[0.2em] uppercase text-xs transition-all duration-300 interactive ${theme==='dark'?'bg-softGold text-dark hover:bg-cream disabled:bg-gray-600':'bg-vintageBrown text-warmBeige hover:bg-darkCharcoal disabled:bg-gray-400'}`}>
+                                            {status === 'loading' ? 'Sending...' : 'Submit Inquiry'}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </motion.div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Footer = () => {
+            const { theme } = useContext(ThemeContext);
+            return (
+                <footer className={`pt-32 pb-12 relative border-t overflow-hidden ${theme==='dark'?'bg-dark border-gray-900':'bg-[#E8E0D5] border-gray-300'}`}>
+                    <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-px bg-gradient-to-r from-transparent to-transparent ${theme==='dark'?'via-softGold/30':'via-vintageBrown/30'}`}></div>
+                    <div className="container mx-auto px-6 md:px-12">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20 relative z-10">
+                            <div className="lg:col-span-1 pr-8">
+                                <div className="mb-6 flex items-center">
+    <img 
+        src="https://res.cloudinary.com/dsqqutdgv/image/upload/v1776667950/LOGO_NH_mtsgjt.png" 
+        alt="NH Creative Logo" 
+        className="h-10 w-auto object-contain" 
+    />
+</div>
+                                <p className={`text-sm leading-relaxed mb-8 ${theme==='dark'?'text-gray-500':'text-gray-600'}`}>Crafting digital experiences beyond imagination. A premium creative studio based in Semarang, Indonesia.</p>
+                            </div>
+                            <div>
+                                <h4 className={`uppercase tracking-[0.2em] text-[10px] font-bold mb-8 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>Ecosystem</h4>
+                                <ul className={`flex flex-col gap-4 text-sm ${theme==='dark'?'text-gray-500':'text-gray-600'}`}>
+                                    <li><a href="#" className={`flex items-center gap-2 transition-colors ${theme==='dark'?'hover:text-softGold':'hover:text-vintageBrown'}`}><span className="w-1 h-1 rounded-full bg-current"></span> NH Creative Studio</a></li>
+                                    <li><a href="#" className={`flex items-center gap-2 transition-colors ${theme==='dark'?'hover:text-softGold':'hover:text-vintageBrown'}`}><span className="w-1 h-1 rounded-full bg-current"></span> NH PixelHive</a></li>
+                                    <li><a href="#" className={`flex items-center gap-2 transition-colors ${theme==='dark'?'hover:text-softGold':'hover:text-vintageBrown'}`}><span className="w-1 h-1 rounded-full bg-current"></span> NHVitation</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className={`uppercase tracking-[0.2em] text-[10px] font-bold mb-8 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>Socials</h4>
+                                <ul className={`flex flex-col gap-4 text-sm ${theme==='dark'?'text-gray-500':'text-gray-600'}`}>
+                                    <li><a href="#" className={`transition-colors ${theme==='dark'?'hover:text-softGold':'hover:text-vintageBrown'}`}>Instagram</a></li>
+                                    <li><a href="#" className={`transition-colors ${theme==='dark'?'hover:text-softGold':'hover:text-vintageBrown'}`}>Behance</a></li>
+                                    <li><a href="#" className={`transition-colors ${theme==='dark'?'hover:text-softGold':'hover:text-vintageBrown'}`}>LinkedIn</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className={`uppercase tracking-[0.2em] text-[10px] font-bold mb-8 ${theme==='dark'?'text-cream':'text-darkCharcoal'}`}>Direct Contact</h4>
+                                <p className={`text-sm leading-relaxed mb-6 font-light ${theme==='dark'?'text-gray-500':'text-gray-600'}`}>Semarang, Central Java<br />Indonesia 50134</p>
+                                <a href="mailto:hello@nhcreative.id" className={`text-lg font-serif transition-colors ${theme==='dark'?'text-softGold hover:text-cream':'text-vintageBrown hover:text-darkCharcoal'}`}>hello@nhcreative.id</a>
+                            </div>
+                        </div>
+                        <div className={`pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 relative z-10 ${theme==='dark'?'border-gray-900/50':'border-gray-400/50'}`}>
+                            <p className={`text-[10px] uppercase tracking-widest ${theme==='dark'?'text-gray-600':'text-gray-500'}`}>&copy; {new Date().getFullYear()} NH Creative. All rights reserved.</p>
+                        </div>
+                    </div>
+                    <div className={`absolute bottom-0 right-0 translate-y-1/4 translate-x-1/4 font-serif text-[15rem] font-bold select-none pointer-events-none z-0 ${theme==='dark'?'text-gray-900/30':'text-gray-300/30'}`}>NH</div>
+                </footer>
+            );
+        };
+
+        const NHVitationPreview = ({ onBack }) => {
+            const [viewport, setViewport] = useState('desktop');
+
+            const getViewportStyles = () => {
+                switch(viewport) {
+                    case 'mobile': 
+                        return 'w-[375px] h-[812px] max-h-[85vh] rounded-[2.5rem] border-[12px] border-gray-900 shadow-2xl';
+                    case 'tablet': 
+                        return 'w-[768px] h-[1024px] max-h-[85vh] rounded-[2rem] border-[12px] border-gray-900 shadow-2xl';
+                    case 'desktop': 
+                    default: 
+                        return 'w-full h-full border-none rounded-none';
+                }
+            };
+
+            return (
+                <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }} className="fixed inset-0 z-[9999] bg-[#0a0a0a] text-white flex flex-col">
+                    <nav className="relative z-20 px-4 py-3 flex justify-between items-center border-b border-rose-900/30 bg-black/90 backdrop-blur-md shrink-0">
+                        <div className="flex items-center gap-4 w-1/3">
+                            <button onClick={onBack} className="p-2 md:p-3 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors interactive">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            </button>
+                            <div className="font-serif text-lg md:text-xl font-bold tracking-widest text-white flex items-center hidden sm:flex">
+                                <span className="text-rose-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]">NH</span><span className="text-[10px] md:text-xs font-sans tracking-[0.2em] font-light ml-2 text-gray-400">VITATION</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-1 bg-gray-900/80 p-1 rounded-xl border border-gray-800">
+                            <button onClick={() => setViewport('desktop')} className={`p-2 rounded-lg transition-all ${viewport === 'desktop' ? 'bg-rose-600/20 text-rose-400' : 'text-gray-500 hover:text-gray-300'}`} title="Desktop">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </button>
+                            <button onClick={() => setViewport('tablet')} className={`p-2 rounded-lg transition-all ${viewport === 'tablet' ? 'bg-rose-600/20 text-rose-400' : 'text-gray-500 hover:text-gray-300'}`} title="Tablet">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M6 21h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            </button>
+                            <button onClick={() => setViewport('mobile')} className={`p-2 rounded-lg transition-all ${viewport === 'mobile' ? 'bg-rose-600/20 text-rose-400' : 'text-gray-500 hover:text-gray-300'}`} title="Mobile">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            </button>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-4 w-1/3">
+                            <span className="hidden lg:inline-block text-[10px] uppercase tracking-widest text-rose-400 font-bold border border-rose-400/30 px-4 py-2 rounded shadow-[inset_0_0_10px_rgba(244,63,94,0.1)]">
+                                Live Preview
+                            </span>
+                            <a href="https://nhvitation.com" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-widest bg-rose-600 hover:bg-rose-500 text-white px-3 py-2 md:px-4 rounded transition-colors flex items-center gap-2 interactive">
+                                <span className="hidden sm:inline">Open Site</span>
+                                <span className="sm:hidden">Open</span>
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                        </div>
+                    </nav>
+                    
+                    <div className="flex-1 w-full bg-[#050505] overflow-hidden flex justify-center items-center relative py-4">
+                        <div className={`relative bg-white overflow-hidden transition-all duration-500 ease-in-out flex items-center justify-center ${getViewportStyles()}`}>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] z-0 pointer-events-none">
+                                <div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                                <p className="text-xs tracking-widest uppercase text-gray-500 font-sans">Connecting...</p>
+                            </div>
+                            <iframe src="https://nhvitation.com" className="w-full h-full border-0 relative z-10 bg-white" title="NHVitation Interactive Preview" sandbox="allow-scripts allow-same-origin allow-forms" />
+                        </div>
+                    </div>
+                </motion.div>
+            );
+        };
+
+        const App = () => {
+            const [isLoading, setIsLoading] = useState(true);
+            const [theme, setTheme] = useState('dark');
+            const [currentRoute, setCurrentRoute] = useState('home');
+            const { scrollYProgress } = useScroll();
+            const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+            useEffect(() => {
+                initThreeJS();
+                console.log("%c NH Creative | Premium Architecture Initialized ", "background: #D4AF37; color: #0a0a0a; font-size: 14px; font-weight: bold; padding: 4px;");
+            }, []);
+
+            const toggleTheme = useCallback(() => {
+                setTheme(prev => {
+                    const newTheme = prev === 'dark' ? 'light' : 'dark';
+                    if(newTheme === 'light') {
+                        document.documentElement.classList.add('light');
+                        document.documentElement.classList.remove('dark');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        document.documentElement.classList.remove('light');
+                    }
+                    updateThreeTheme(newTheme === 'dark');
+                    return newTheme;
+                });
+            }, []);
+
+            return (
+                <ThemeContext.Provider value={{ theme, toggleTheme }}>
+                    <div className="relative z-10 font-sans">
+                        <AnimatePresence mode="wait">
+                            {isLoading && <LoadingScreen key="loading" onComplete={() => setIsLoading(false)} />}
+                            
+                            {!isLoading && currentRoute === 'pixelhive' && (
+                                <motion.div key="pixelhive-route" initial={{ opacity: 0, scale: 1.1, filter: 'blur(20px)' }} animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }} transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }} className="absolute inset-0 z-50 bg-[#0a0a0a]">
+                                    <PixelHiveExperience onBack={() => { window.scrollTo(0,0); setCurrentRoute('home'); }} />
+                                </motion.div>
+                            )}
+
+                            {!isLoading && currentRoute === 'nhvitation' && (
+                                <motion.div key="nhvitation-route" className="absolute inset-0 z-50 bg-[#0a0a0a]">
+                                    <NHVitationPreview onBack={() => { window.scrollTo(0,0); setCurrentRoute('home'); }} />
+                                </motion.div>
+                            )}
+
+                            {!isLoading && currentRoute === 'home' && (
+                                <motion.div key="home-route" initial={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }} animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }} transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }} className="relative w-full h-full">
+                                    <CustomCursor />
+                                    <FloatingControls />
+                                    <AIAssistant />
+                                    <motion.div className={`fixed top-0 left-0 right-0 h-[3px] origin-left z-[60] ${theme==='dark'?'bg-softGold mix-blend-difference':'bg-vintageBrown'}`} style={{ scaleX }} />
+                                    <Navbar />
+                                    <main>
+                                        <Hero />
+                                        <About />
+                                        <Process />
+                                        <Ecosystem onNavigate={setCurrentRoute} />
+                                        <PremiumServices onNavigate={setCurrentRoute} />
+                                        <TrustAndSecurity />
+                                        <ClientSupport />
+                                        <Portfolio />
+                                        <Testimonials />
+                                        <Achievements />
+                                        <CreativeJournal />
+                                        <Collaboration />
+                                    </main>
+                                    <Footer />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </ThemeContext.Provider>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
