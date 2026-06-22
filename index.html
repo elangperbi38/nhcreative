@@ -648,8 +648,12 @@
                                     <motion.div animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} className={`w-64 h-64 border border-dashed rounded-full flex items-center justify-center ${theme==='dark'?'border-softGold/30':'border-vintageBrown/30'}`}>
                                         <div className={`w-48 h-48 border rounded-full ${theme==='dark'?'border-softGold/20':'border-vintageBrown/20'}`}></div>
                                     </motion.div>
-                                    <div className={`absolute font-serif text-8xl italic opacity-10 ${theme==='dark'?'text-softGold':'text-vintageBrown'}`}>NH</div>
-                                </div>
+                                    // GANTI DENGAN GAMBAR LOGO SAMAR
+<img 
+    src="URL_GAMBAR_LOGO_ANDA.png" 
+    alt="Logo Watermark" 
+    className="absolute w-40 h-40 object-contain opacity-20" 
+/>
                                 <div className={`absolute bottom-8 left-8 right-8 p-6 rounded-xl backdrop-blur-md border ${theme==='dark'?'bg-black/40 border-white/10':'bg-white/40 border-black/10'}`}>
                                     <p className={`text-sm italic ${theme==='dark'?'text-gray-300':'text-gray-700'}`}>"We turn abstract visions into digital realities that command attention."</p>
                                 </div>
