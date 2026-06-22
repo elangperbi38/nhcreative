@@ -1018,6 +1018,20 @@
             }, []);
             
             if (!product) return null;
+            // FUNGSI BARU UNTUK WHATSAPP
+            const handleContactSeller = () => {
+                // GANTI DENGAN NOMOR WA ANDA (Gunakan format 62 tanpa tanda + atau 0)
+                const phoneNumber = "6285194995505"; 
+                
+                // Template Pesan Dinamis (Otomatis mengambil judul produk)
+                const message = `Halo NH Creative, saya tertarik dengan produk *${product.title}* di NH PixelHive. Boleh minta info lebih lanjut?`;
+                
+                // Encode pesan menjadi format URL yang aman
+                const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                
+                // Buka di tab baru
+                window.open(waUrl, '_blank');
+            };
 
             const modalContent = (
                 <motion.div 
