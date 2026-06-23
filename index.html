@@ -652,12 +652,9 @@
             );
         };
 
-        // KODE API KEY GEMINI (Pastikan Key Ini Benar)
-        const GEMINI_API_KEY = "AIzaSyC0tx1wqRo9OT93udq3WZlrut6iVdSjyU0";
-
         const AIAssistant = () => {
             const [isOpen, setIsOpen] = useState(false);
-            const [messages, setMessages] = useState([{ text: "Hello! I am NH AI Assistant. How can I help you build your digital experience today?", sender: "ai" }]);
+            const [messages, setMessages] = useState([{ text: "Halo! Saya adalah NH AI Assistant. Ada yang bisa saya bantu terkait layanan digital kami hari ini?", sender: "ai" }]);
             const [input, setInput] = useState("");
             const [isTyping, setIsTyping] = useState(false);
             const messagesEndRef = useRef(null);
@@ -666,56 +663,36 @@
             const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
             useEffect(() => { scrollToBottom(); }, [messages, isOpen, isTyping]);
 
-            // Fungsi untuk berinteraksi dengan API Gemini
-            const generateAIResponse = async (userMessage) => {
-                if (!GEMINI_API_KEY || GEMINI_API_KEY === "MASUKKAN_DI_SINI") {
-                    return "Mohon maaf, API Key Gemini belum dikonfigurasi.";
-                }
-
-                const systemContext = "Anda adalah NH AI Assistant, asisten cerdas untuk NH Creative, sebuah agensi kreatif dan studio desain premium yang berbasis di Semarang, Jawa Tengah, Indonesia. Konteks Bisnis NH Creative: - Layanan Utama: Digital Invitation Website (via brand NHVitation), Landing Page Development, Professional Web Development, Graphic & Brand Design, dan Digital Products (via brand NH PixelHive). - NHVitation: Platform undangan pernikahan digital premium, elegan, dan imersif. - NH PixelHive: Marketplace produk digital masa depan (menjual UI Kit, Template Next.js/React, Mockup Industri Vintage, Aset 3D, dan Preset LUT Sinematik). - Gaya komunikasi Anda: Profesional, premium, elegan, ramah, dan sangat membantu. Jawab dengan gaya 'luxury brand'. - Bahasa: Anda otomatis menyesuaikan dengan bahasa yang digunakan pengunjung (bisa bahasa Inggris, Indonesia, dll). Jawab secara lugas dan relevan. - Harga/Budget: Jika ditanya harga, katakan bahwa investasi bervariasi tergantung kerumitan. Namun arahkan mereka dengan sopan untuk menggunakan Form Kolaborasi di bagian bawah website, atau melalui WhatsApp tim inti.\n\nPertanyaan Pengunjung: " + userMessage;
-
-                try {
-                    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_API_KEY, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: systemContext }] }]
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    // JIKA ERROR DARI GOOGLE
-                    if (!response.ok) {
-                        let pesanError = response.statusText;
-                        if (data && data.error && data.error.message) {
-                            pesanError = data.error.message;
-                        }
-                        return "🚨 ERROR API GOOGLE: " + pesanError + " (Cek kembali validitas API Key Anda di Google Cloud Console)";
-                    }
-                    
-                    // JIKA BERHASIL
-                    if (data.candidates && data.candidates[0].content) {
-                        return data.candidates[0].content.parts[0].text;
-                    }
-                    return "Maaf, struktur respon dari AI tidak sesuai.";
-                    
-                } catch (error) {
-                    return "🚨 ERROR JARINGAN: " + error.message + ". Pastikan koneksi internet Anda lancar.";
-                }
-            };
-
-            const handleSend = async (e) => {
+            const handleSend = (e) => {
                 e.preventDefault();
                 if (!input.trim()) return;
                 const userMsg = input.trim();
                 setMessages(prev => [...prev, { text: userMsg, sender: "user" }]);
                 setInput("");
                 
+                // Animasi Mengetik AI
                 setIsTyping(true);
-                const aiResponse = await generateAIResponse(userMsg);
-                setIsTyping(false);
-                setMessages(prev => [...prev, { text: aiResponse, sender: "ai" }]);
+
+                // Simulasi kecerdasan AI Virtual tanpa API
+                setTimeout(() => {
+                    let aiResponse = "Terima kasih atas pesannya! Tim NH Creative akan segera merespons Anda. Apakah ada hal spesifik lain yang ingin ditanyakan?";
+                    const lowerInput = userMsg.toLowerCase();
+                    
+                    if (lowerInput.includes("budget") || lowerInput.includes("harga") || lowerInput.includes("price") || lowerInput.includes("biaya")) {
+                        aiResponse = "Investasi project di NH Creative bervariasi. Pembuatan Landing Page dimulai dari tier standar, sementara platform kustom (Professional Web) dan Branding memiliki penawaran khusus sesuai tingkat kerumitan. Silakan gunakan form 'Collaborate' di bawah untuk mendapatkan estimasi!";
+                    } else if (lowerInput.includes("service") || lowerInput.includes("layanan") || lowerInput.includes("paket")) {
+                        aiResponse = "Layanan eksklusif kami meliputi: Professional Web Development, Landing Pages yang dioptimasi, Brand Identity, dan Undangan Digital Premium (NHVitation). Bagian mana yang menarik minat Anda?";
+                    } else if (lowerInput.includes("recommend") || lowerInput.includes("saran") || lowerInput.includes("rekomendasi")) {
+                        aiResponse = "Untuk hasil yang paling maksimal, kami sangat menyarankan 'Ecosystem Package'. Paket ini mencakup pembuatan Brand Identity, Custom Website, dan Strategi UI/UX secara menyeluruh.";
+                    } else if (lowerInput.includes("halo") || lowerInput.includes("hi") || lowerInput.includes("hai") || lowerInput.includes("hello")) {
+                        aiResponse = "Halo juga! Selamat datang di ekosistem NH Creative. Jelajahi portofolio kami atau tanyakan layanan apa pun kepada saya.";
+                    } else if (lowerInput.includes("pixelhive") || lowerInput.includes("template") || lowerInput.includes("produk digital")) {
+                        aiResponse = "NH PixelHive adalah marketplace khusus kami yang menyediakan aset digital premium, seperti UI Kits, Mockups Industri, Preset Cinematic, dan Template Web. Anda bisa mengeksplorasinya di menu Brand Ecosystem.";
+                    }
+
+                    setIsTyping(false);
+                    setMessages(prev => [...prev, { text: aiResponse, sender: "ai" }]);
+                }, 1500); // Jeda 1.5 detik agar terlihat AI sedang berpikir
             };
 
             const formatText = (text) => {
@@ -735,7 +712,7 @@
                                         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-softGold to-vintageBrown flex items-center justify-center text-dark font-serif text-sm font-bold shadow-lg">AI</div>
                                         <div>
                                             <h4 className={`text-sm font-bold ${theme === 'dark' ? 'text-cream' : 'text-darkCharcoal'}`}>NH AI Assistant</h4>
-                                            <p className="text-[10px] text-green-500 flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Powered by Gemini</p>
+                                            <p className="text-[10px] text-green-500 flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p>
                                         </div>
                                     </div>
                                     <button onClick={() => setIsOpen(false)} className={`p-1.5 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-200 text-gray-600'}`}>
@@ -771,7 +748,7 @@
                                         value={input} 
                                         onChange={(e) => setInput(e.target.value)} 
                                         disabled={isTyping}
-                                        placeholder={isTyping ? "AI is typing..." : "Ask about our services..."} 
+                                        placeholder={isTyping ? "AI is typing..." : "Tanyakan tentang layanan kami..."} 
                                         className={`flex-1 bg-transparent text-sm outline-none px-3 disabled:opacity-50 ${theme === 'dark' ? 'text-cream' : 'text-darkCharcoal'}`} 
                                     />
                                     <button type="submit" disabled={isTyping || !input.trim()} className={`p-2.5 rounded-xl transition-all ${theme === 'dark' ? 'bg-softGold/20 text-softGold hover:bg-softGold hover:text-dark disabled:bg-gray-800 disabled:text-gray-600' : 'bg-vintageBrown/20 text-vintageBrown hover:bg-vintageBrown hover:text-warmBeige disabled:bg-gray-200 disabled:text-gray-400'}`}>
