@@ -184,57 +184,20 @@
 
         class AudioEngine {
             constructor() {
-                this.ctx = null;
-                this.oscillator = null;
-                this.gainNode = null;
-                this.filter = null;
+                // MASUKKAN URL MUSIK / SOUND MP3 ANDA DI SINI
+                // Contoh: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+                this.bgMusic = new Audio('https://soundcloud.com/soundaudiomusic/urban-rhythm-electronic-uplifting-background-royalty-free-music?si=301d8437802b4cf4a49bcb5d95d8cb32&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing');
+                this.bgMusic.loop = true;
+                this.bgMusic.volume = 0.5; // Mengatur volume (0.0 sampai 1.0)
                 this.isPlaying = false;
-                this.lfo = null;
-            }
-
-            init() {
-                if(this.ctx) return;
-                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                this.oscillator = this.ctx.createOscillator();
-                this.oscillator.type = 'triangle';
-                this.oscillator.frequency.value = 60;
-
-                this.filter = this.ctx.createBiquadFilter();
-                this.filter.type = 'lowpass';
-                this.filter.frequency.value = 300;
-
-                this.lfo = this.ctx.createOscillator();
-                this.lfo.type = 'sine';
-                this.lfo.frequency.value = 0.1; 
-                const lfoGain = this.ctx.createGain();
-                lfoGain.gain.value = 100;
-                
-                this.lfo.connect(lfoGain);
-                lfoGain.connect(this.filter.frequency);
-
-                this.gainNode = this.ctx.createGain();
-                this.gainNode.gain.value = 0;
-
-                this.oscillator.connect(this.filter);
-                this.filter.connect(this.gainNode);
-                this.gainNode.connect(this.ctx.destination);
-
-                this.oscillator.start();
-                this.lfo.start();
             }
 
             toggle() {
-                if(!this.ctx) this.init();
-                
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-
-                if(this.isPlaying) {
-                    this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 1);
+                if (this.isPlaying) {
+                    this.bgMusic.pause();
                 } else {
-                    this.gainNode.gain.setTargetAtTime(0.2, this.ctx.currentTime, 2);
+                    // Mencegah error jika browser memblokir autoplay
+                    this.bgMusic.play().catch(err => console.log("Autoplay prevented", err));
                 }
                 this.isPlaying = !this.isPlaying;
                 return this.isPlaying;
