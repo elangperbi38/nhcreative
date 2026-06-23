@@ -669,10 +669,9 @@
             // Fungsi untuk berinteraksi dengan API Gemini
             const generateAIResponse = async (userMessage) => {
                 if (!GEMINI_API_KEY || GEMINI_API_KEY === "MASUKKAN_DI_SINI") {
-                    return "Mohon maaf, API Key Gemini belum dikonfigurasi. Developer harap memasukkan API Key di dalam script untuk mengaktifkan kecerdasan buatan yang sebenarnya.";
+                    return "Mohon maaf, API Key Gemini belum dikonfigurasi.";
                 }
 
-                // Prompt Sistem untuk melatih AI memahami bisnis Anda
                 const systemContext = `Anda adalah NH AI Assistant, asisten cerdas untuk NH Creative, sebuah agensi kreatif dan studio desain premium yang berbasis di Semarang, Jawa Tengah, Indonesia.
 Konteks Bisnis NH Creative:
 - Layanan Utama: Digital Invitation Website (via brand NHVitation), Landing Page Development, Professional Web Development, Graphic & Brand Design, dan Digital Products (via brand NH PixelHive).
@@ -680,7 +679,7 @@ Konteks Bisnis NH Creative:
 - NH PixelHive: Marketplace produk digital masa depan (menjual UI Kit, Template Next.js/React, Mockup Industri Vintage, Aset 3D, dan Preset LUT Sinematik).
 - Gaya komunikasi Anda: Profesional, premium, elegan, ramah, dan sangat membantu. Jawab dengan gaya "luxury brand".
 - Bahasa: Anda otomatis menyesuaikan dengan bahasa yang digunakan pengunjung (bisa bahasa Inggris, Indonesia, dll). Jawab secara lugas dan relevan.
-- Harga/Budget: Jika ditanya harga, katakan bahwa investasi bervariasi tergantung kerumitan. Namun arahkan mereka dengan sopan untuk menggunakan Form Kolaborasi di bagian bawah website, atau melalui WhatsApp tim inti. Jangan mengarang harga jika tidak ditanya spesifik soal produk PixelHive.
+- Harga/Budget: Jika ditanya harga, katakan bahwa investasi bervariasi tergantung kerumitan. Namun arahkan mereka dengan sopan untuk menggunakan Form Kolaborasi di bagian bawah website, atau melalui WhatsApp tim inti.
 
 Pertanyaan Pengunjung: "${userMessage}"`;
 
@@ -693,16 +692,21 @@ Pertanyaan Pengunjung: "${userMessage}"`;
                         })
                     });
                     
-                    if (!response.ok) throw new Error("Terjadi kesalahan jaringan.");
                     const data = await response.json();
+                    
+                    // JIKA TERJADI ERROR DARI GOOGLE, TAMPILKAN ERROR ASLINYA DI CHAT
+                    if (!response.ok) {
+                        return `🚨 GAGAL TERHUBUNG KE GOOGLE: ${data.error?.message || response.statusText}. 
+                        (Solusi: Jika pesan error menyebut 'API key not valid', periksa kodenya. Jika menyebut 'API key not valid for this referer', artinya Google memblokir karena aturan domain/website restriction di Google Cloud Console).`;
+                    }
                     
                     if (data.candidates && data.candidates[0].content) {
                         return data.candidates[0].content.parts[0].text;
                     }
-                    return "Maaf, terjadi kesalahan saat memproses respon.";
+                    return "Maaf, struktur respon dari AI tidak sesuai.";
+                    
                 } catch (error) {
-                    console.error("AI Error:", error);
-                    return "Maaf, sistem AI sedang sibuk saat ini. Silakan hubungi kami via email atau form kontak di bawah untuk bantuan langsung.";
+                    return `🚨 ERROR JARINGAN: ${error.message}. Pastikan koneksi internet Anda lancar dan browser Anda tidak memblokir script eksternal.`;
                 }
             };
 
