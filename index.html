@@ -654,7 +654,7 @@
 
         const AIAssistant = () => {
             const [isOpen, setIsOpen] = useState(false);
-            const [messages, setMessages] = useState([{ text: "Halo! Saya adalah NH AI Assistant. Ada yang bisa saya bantu terkait layanan digital kami hari ini?", sender: "ai" }]);
+            const [messages, setMessages] = useState([{ text: "Halo! Saya Asisten AI NH Creative. Ada yang bisa saya bantu terkait pembuatan Website, Undangan Digital, atau Desain hari ini?", sender: "ai" }]);
             const [input, setInput] = useState("");
             const [isTyping, setIsTyping] = useState(false);
             const messagesEndRef = useRef(null);
@@ -663,6 +663,84 @@
             const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
             useEffect(() => { scrollToBottom(); }, [messages, isOpen, isTyping]);
 
+            // OTAK AI VIRTUAL (SMART CHATBOT ALGORITHM)
+            const generateSimulatedResponse = (text) => {
+                const inputLower = text.toLowerCase();
+                
+                // 1. Deteksi Cara Order / Isi Form
+                if (inputLower.match(/(order|pesan|beli|checkout|cara kerja|isi form|formulir|gimana cara)/)) {
+                    if (inputLower.match(/(pixelhive|template|ui kit|mockup|aset)/)) {
+                        return "Untuk membeli produk digital (Template, UI Kit, dll), Anda bisa klik tombol 'Explore NH PixelHive' di menu Ecosystem, pilih produknya, dan klik 'Continue to Secure Payment'. Pembayaran otomatis via Lynk.id 🛒.";
+                    }
+                    if (inputLower.match(/(undangan|wedding|nhvitation)/)) {
+                        return "Untuk memesan Undangan Digital (NHVitation), silakan isi form kolaborasi di bagian paling bawah website ini, atau langsung klik tombol Chat WhatsApp untuk berdiskusi dengan admin kami 💍.";
+                    }
+                    return "Untuk pemesanan layanan Web Development, Desain, atau Undangan Digital, silakan scroll ke bagian paling bawah web ini dan isi Form Kolaborasi. Pastikan Anda juga mengisi nomor WhatsApp agar bisa kami hubungi kembali. Anda juga bisa langsung menekan tombol 'Chat WhatsApp' di sebelah form tersebut! 🚀";
+                }
+
+                // 2. Deteksi Harga spesifik & general
+                if (inputLower.match(/(harga|biaya|budget|tarif|pricelist|price|cost|bayar|berapa|duit)/)) {
+                    if (inputLower.match(/(undangan|wedding|nikah|nhvitation)/)) {
+                        return "Investasi untuk Undangan Digital (NHVitation) sangat terjangkau, mulai dari Rp 79.000 untuk paket All-in-One. Anda bisa melihat preview-nya dengan mengklik tombol 'Live Preview' pada NHVitation di menu Ecosystem 💍.";
+                    }
+                    if (inputLower.match(/(template|ui kit|mockup|pixelhive|aset)/)) {
+                        return "Harga produk digital di NH PixelHive sangat bervariasi (mulai dari Rp 79.000 hingga Rp 450.000). Semua harga dan detail produk bisa Anda lihat langsung dengan mengklik 'Explore NH PixelHive' di bagian Ecosystem! 📦";
+                    }
+                    if (inputLower.match(/(web|website|landing page)/)) {
+                        return "Untuk project Website (Landing page / Company Profile) & Branding, nilai investasi sangat bergantung pada kerumitan dan fitur yang Anda butuhkan. Saya sarankan Anda berdiskusi langsung dengan tim kami via WhatsApp (tombol ada di bagian form paling bawah) untuk estimasi yang akurat! 💼";
+                    }
+                    return "Kami memiliki beberapa kategori harga:\n1. **Produk Digital (PixelHive)**: Rp 79rb - Rp 450k.\n2. **Undangan Digital (NHVitation)**: Mulai Rp 79rb.\n3. **Website & Branding Custom**: Custom sesuai kebutuhan.\nBisa spesifikasikan layanan mana yang ingin Anda ketahui harganya? 😊";
+                }
+
+                // 3. Deteksi Penjelasan PixelHive
+                if (inputLower.match(/(apa itu pixelhive|pixelhive|jual apa|template|ui kit|mockup|aset|asset|lut|preset)/)) {
+                    return "**NH PixelHive** adalah marketplace produk digital masa depan dari kami. Kami menjual aset kreatif seperti UI Kit Figma, Template React/Next.js, Mockup Industri Vintage, Preset LUT Sinematik, dan 3D Icon. Silakan cek katalog dan harganya secara langsung dengan menekan menu 'Explore NH PixelHive' ya! 📦";
+                }
+
+                // 4. Deteksi Penjelasan NHVitation / Undangan Nikah
+                if (inputLower.match(/(apa itu nhvitation|nhvitation|nikah|kawin|wedding|undangan|invitation|merit)/)) {
+                    return "**NHVitation** adalah layanan khusus dari kami yang bergerak secara eksklusif pada pembuatan Undangan Pernikahan Digital. Undangan ini premium, elegan, dan imersif (lengkap dengan RSVP, galeri, musik, dan countdown). Ingin melihat hasilnya? Silakan kunjungi **nhvitation.com** atau klik 'Live Preview' pada menu Ecosystem ✨.";
+                }
+
+                // 5. Deteksi Jasa Web / Landing Page
+                if (inputLower.match(/(web|website|landing page|bikin web|buat web|profil|company|toko online|ecommerce)/)) {
+                    return "Kami ahli dalam merancang Website! Mulai dari Landing Page untuk konversi penjualan, Company Profile profesional, hingga Custom Web App tingkat lanjut. Web buatan kami dijamin Mobile Friendly & Fast Loading 🚀. Ingin mendiskusikan web impian Anda? Yuk isi form di bawah atau chat WA kami.";
+                }
+
+                // 6. Deteksi Jasa Desain / Branding
+                if (inputLower.match(/(desain|design|logo|branding|identitas|sosmed|sosial media|poster|banner)/)) {
+                    return "Identitas visual adalah kunci bisnis Anda! Tim desainer grafis kami siap membantu Anda membuat Logo, Brand Identity lengkap, hingga aset desain untuk sosial media yang estetik dan terkesan premium 🎨.";
+                }
+
+                // 7. Deteksi Jasa Layanan / General Services
+                if (inputLower.match(/(jasa|layanan|bisa bikin apa|service|produk)/)) {
+                    return "NH Creative memiliki beberapa ekosistem layanan:\n1. **Web Development & Branding** (Custom Landing Page, Profil Perusahaan, Logo).\n2. **NHVitation** (Pembuatan Undangan Digital Premium).\n3. **NH PixelHive** (Marketplace produk digital seperti Template, UI Kit, dll).\nAda yang secara khusus menarik perhatian Anda? 🌟";
+                }
+
+                // 8. Deteksi Lokasi & Kontak (WA)
+                if (inputLower.match(/(kontak|wa|whatsapp|hubungi|nomor|lokasi|alamat|dimana|kantor|telepon|no hp)/)) {
+                    return "Kantor pusat kreatif kami berlokasi di Semarang, Jawa Tengah, Indonesia 📍. Untuk respon tercepat, silakan scroll ke bagian paling bawah web ini dan klik tombol 'Chat WhatsApp', atau email kami di hello@nhcreative.id.";
+                }
+
+                // 9. Deteksi Salam & Sapaan
+                if (inputLower.match(/^(halo|hai|hi|pagi|siang|sore|malam|helo|hello|assalamualaikum|ping|p)$/)) {
+                    return "Halo! Selamat datang di NH Creative. Saya asisten virtual cerdas Anda. Ingin info tentang layanan Jasa Web, Undangan Digital (NHVitation), atau aset produk digital (PixelHive)?";
+                }
+
+                // 10. Deteksi Portofolio / Contoh Hasil Karya
+                if (inputLower.match(/(portofolio|contoh|hasil|karya|portfolio|project)/)) {
+                    return "Tentu! Anda bisa melihat karya-karya kebanggaan kami (seperti desain untuk Aether Cosmetics atau Lumina Gala) dengan melihat ke bagian 'Selected Works' di website ini 🏆.";
+                }
+
+                // 11. Deteksi Pujian / Apresiasi
+                if (inputLower.match(/(bagus|keren|mantap|oke|siap|terima kasih|thanks|makasih|y)/)) {
+                    return "Sama-sama! Terima kasih atas apresiasinya. Jangan ragu untuk menghubungi tim inti kami lewat Form atau WhatsApp di bawah jika Anda ingin segera berkolaborasi! 😊";
+                }
+
+                // 12. Fallback / Default
+                return "Hmm, pertanyaan yang sangat menarik! Agar saya dapat memberikan informasi yang paling akurat terkait hal tersebut, saya sarankan Anda untuk langsung berdiskusi dengan tim ahli kami. Silakan isi form di bagian bawah website atau langsung klik tombol Chat WhatsApp ya! 🙏";
+            };
+
             const handleSend = (e) => {
                 e.preventDefault();
                 if (!input.trim()) return;
@@ -670,31 +748,17 @@
                 setMessages(prev => [...prev, { text: userMsg, sender: "user" }]);
                 setInput("");
                 
-                // Animasi Mengetik AI
                 setIsTyping(true);
 
-                // Simulasi kecerdasan AI Virtual tanpa API
+                // Simulasi delay berpikir AI (1 sampai 2 detik)
                 setTimeout(() => {
-                    let aiResponse = "Terima kasih atas pesannya! Tim NH Creative akan segera merespons Anda. Apakah ada hal spesifik lain yang ingin ditanyakan?";
-                    const lowerInput = userMsg.toLowerCase();
-                    
-                    if (lowerInput.includes("budget") || lowerInput.includes("harga") || lowerInput.includes("price") || lowerInput.includes("biaya")) {
-                        aiResponse = "Investasi project di NH Creative bervariasi. Pembuatan Landing Page dimulai dari tier standar, sementara platform kustom (Professional Web) dan Branding memiliki penawaran khusus sesuai tingkat kerumitan. Silakan gunakan form 'Collaborate' di bawah untuk mendapatkan estimasi!";
-                    } else if (lowerInput.includes("service") || lowerInput.includes("layanan") || lowerInput.includes("paket")) {
-                        aiResponse = "Layanan eksklusif kami meliputi: Professional Web Development, Landing Pages yang dioptimasi, Brand Identity, dan Undangan Digital Premium (NHVitation). Bagian mana yang menarik minat Anda?";
-                    } else if (lowerInput.includes("recommend") || lowerInput.includes("saran") || lowerInput.includes("rekomendasi")) {
-                        aiResponse = "Untuk hasil yang paling maksimal, kami sangat menyarankan 'Ecosystem Package'. Paket ini mencakup pembuatan Brand Identity, Custom Website, dan Strategi UI/UX secara menyeluruh.";
-                    } else if (lowerInput.includes("halo") || lowerInput.includes("hi") || lowerInput.includes("hai") || lowerInput.includes("hello")) {
-                        aiResponse = "Halo juga! Selamat datang di ekosistem NH Creative. Jelajahi portofolio kami atau tanyakan layanan apa pun kepada saya.";
-                    } else if (lowerInput.includes("pixelhive") || lowerInput.includes("template") || lowerInput.includes("produk digital")) {
-                        aiResponse = "NH PixelHive adalah marketplace khusus kami yang menyediakan aset digital premium, seperti UI Kits, Mockups Industri, Preset Cinematic, dan Template Web. Anda bisa mengeksplorasinya di menu Brand Ecosystem.";
-                    }
-
+                    const aiResponse = generateSimulatedResponse(userMsg);
                     setIsTyping(false);
                     setMessages(prev => [...prev, { text: aiResponse, sender: "ai" }]);
-                }, 1500); // Jeda 1.5 detik agar terlihat AI sedang berpikir
+                }, 1500);
             };
 
+            // Format markdown ringan untuk respon AI (mencetak tebal)
             const formatText = (text) => {
                 return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
             };
@@ -711,8 +775,8 @@
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-softGold to-vintageBrown flex items-center justify-center text-dark font-serif text-sm font-bold shadow-lg">AI</div>
                                         <div>
-                                            <h4 className={`text-sm font-bold ${theme === 'dark' ? 'text-cream' : 'text-darkCharcoal'}`}>NH AI Assistant</h4>
-                                            <p className="text-[10px] text-green-500 flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p>
+                                            <h4 className={`text-sm font-bold ${theme === 'dark' ? 'text-cream' : 'text-darkCharcoal'}`}>NH Smart Assistant</h4>
+                                            <p className="text-[10px] text-green-500 flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500"></span> Fast Response</p>
                                         </div>
                                     </div>
                                     <button onClick={() => setIsOpen(false)} className={`p-1.5 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-200 text-gray-600'}`}>
@@ -748,7 +812,7 @@
                                         value={input} 
                                         onChange={(e) => setInput(e.target.value)} 
                                         disabled={isTyping}
-                                        placeholder={isTyping ? "AI is typing..." : "Tanyakan tentang layanan kami..."} 
+                                        placeholder={isTyping ? "AI is typing..." : "Tanya harga, layanan, alamat..."} 
                                         className={`flex-1 bg-transparent text-sm outline-none px-3 disabled:opacity-50 ${theme === 'dark' ? 'text-cream' : 'text-darkCharcoal'}`} 
                                     />
                                     <button type="submit" disabled={isTyping || !input.trim()} className={`p-2.5 rounded-xl transition-all ${theme === 'dark' ? 'bg-softGold/20 text-softGold hover:bg-softGold hover:text-dark disabled:bg-gray-800 disabled:text-gray-600' : 'bg-vintageBrown/20 text-vintageBrown hover:bg-vintageBrown hover:text-warmBeige disabled:bg-gray-200 disabled:text-gray-400'}`}>
