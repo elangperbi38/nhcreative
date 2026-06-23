@@ -696,18 +696,14 @@ Pertanyaan Pengunjung: "${userMessage}"`;
                     
                     // JIKA TERJADI ERROR DARI GOOGLE, TAMPILKAN ERROR ASLINYA DI CHAT
                     if (!response.ok) {
-                        return `🚨 GAGAL TERHUBUNG KE GOOGLE: ${data.error?.message || response.statusText}. 
-                        (Solusi: Jika pesan error menyebut 'API key not valid', periksa kodenya. Jika menyebut 'API key not valid for this referer', artinya Google memblokir karena aturan domain/website restriction di Google Cloud Console).`;
+                        let pesanError = "Error tidak diketahui";
+                        if (data && data.error && data.error.message) {
+                            pesanError = data.error.message;
+                        } else {
+                            pesanError = response.statusText;
+                        }
+                        return "🚨 ERROR DARI GOOGLE: " + pesanError;
                     }
-                    
-                    if (data.candidates && data.candidates[0].content) {
-                        return data.candidates[0].content.parts[0].text;
-                    }
-                    return "Maaf, struktur respon dari AI tidak sesuai.";
-                    
-                } catch (error) {
-                    return `🚨 ERROR JARINGAN: ${error.message}. Pastikan koneksi internet Anda lancar dan browser Anda tidak memblokir script eksternal.`;
-                }
             };
 
             const handleSend = async (e) => {
